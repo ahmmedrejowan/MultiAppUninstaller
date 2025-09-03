@@ -33,6 +33,8 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
+
     }
 }
 
@@ -53,4 +55,39 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+
+    // google fonts
+    implementation(libs.androidx.ui.text.google.fonts)
+
+
+    // koin
+    implementation(libs.koin.androidx.compose)
+
+    // lifecycle
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+
+
+    // splash screen api
+    implementation(libs.androidx.core.splashscreen)
+
+    // icon
+    implementation(libs.androidx.material.icons.extended.android)
+
+    // accompanist
+    implementation(libs.accompanist.insets)
+    implementation(libs.accompanist.permissions)
+
+
+    // data store
+    implementation(libs.androidx.datastore.preferences)
+
+    // coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
+    // timber
+    implementation(libs.timber)
+
 }
