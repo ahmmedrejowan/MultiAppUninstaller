@@ -1,6 +1,5 @@
 package com.rejowan.multiappuninstaller.feature.module.home
 
-import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.compose.foundation.layout.Box
@@ -24,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,74 +32,59 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.rejowan.multiappuninstaller.di.mainModule
 import com.rejowan.multiappuninstaller.feature.components.SingleAppInfoScreen
+import com.rejowan.multiappuninstaller.vm.MainViewModel
+import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.KoinApplication
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    mainViewModel: MainViewModel = koinViewModel(),
+) {
 
     val context = LocalContext.current
-    var apps by remember { mutableStateOf<List<PackageInfo>>(emptyList()) }
-    var error by remember { mutableStateOf<String?>(null) }
-    var loading by remember { mutableStateOf(false) }
+    val appList by mainViewModel.apps.collectAsState()
+    val appListError by mainViewModel.error.collectAsState()
+    val appListLoading by mainViewModel.loading.collectAsState()
 
+    val hasPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        context.checkSelfPermission(android.Manifest.permission.QUERY_ALL_PACKAGES) == PackageManager.PERMISSION_GRANTED
+    } else {
+        true
+    }
+
+    if (!hasPermission) {
+        mainViewModel.setError("Permission not granted to access app list.")
+    } else {
+        LaunchedEffect(Unit) {
+            mainViewModel.loadApps()
+        }
+    }
 
     var expanded by remember { mutableStateOf(false) }
     var selectedSortingOption by remember { mutableStateOf("Name ASC") }
 
     // Sort logic
     val sortOptions = listOf("Name ASC", "Name DESC", "Size ASC", "Size DESC", "Date ASC", "Date DESC")
-    val sortedApps = remember(apps, selectedSortingOption) {
+    val sortedApps = remember(appList, selectedSortingOption) {
         when (selectedSortingOption) {
-            "Name ASC" -> apps.sortedBy { it.applicationInfo?.loadLabel(context.packageManager).toString().lowercase() }
-            "Name DESC" -> apps.sortedByDescending {
+            "Name ASC" -> appList.sortedBy { it.applicationInfo?.loadLabel(context.packageManager).toString().lowercase() }
+            "Name DESC" -> appList.sortedByDescending {
                 it.applicationInfo?.loadLabel(context.packageManager).toString().lowercase()
             }
 
-            "Size ASC" -> apps.sortedBy { java.io.File(it.applicationInfo?.sourceDir).length() }
-            "Size DESC" -> apps.sortedByDescending { java.io.File(it.applicationInfo?.sourceDir).length() }
-            "Date ASC" -> apps.sortedBy { it.firstInstallTime }
-            "Date DESC" -> apps.sortedByDescending { it.firstInstallTime }
-            else -> apps
+            "Size ASC" -> appList.sortedBy { java.io.File(it.applicationInfo?.sourceDir).length() }
+            "Size DESC" -> appList.sortedByDescending { java.io.File(it.applicationInfo?.sourceDir).length() }
+            "Date ASC" -> appList.sortedBy { it.firstInstallTime }
+            "Date DESC" -> appList.sortedByDescending { it.firstInstallTime }
+            else -> appList
         }
     }
 
 
-    // Check and request permission if necessary (if using QUERY_ALL_PACKAGES permission)
-    val hasPermission =
-        context.checkSelfPermission(android.Manifest.permission.QUERY_ALL_PACKAGES) == PackageManager.PERMISSION_GRANTED
-    if (!hasPermission) {
-        error = "Permission not granted to access app list."
-    }
-
-    LaunchedEffect(Unit) {
-        if (hasPermission) {
-            loading = true
-            try {
-                // Fetch installed apps
-                val pm = context.packageManager
-                val packageList: List<PackageInfo> = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    pm.getInstalledPackages(PackageManager.PackageInfoFlags.of(0))
-                } else {
-                    @Suppress("DEPRECATION") pm.getInstalledPackages(0)
-                }
-
-                // all apps
-                //  apps = packageList.sortedBy { it.applicationInfo?.loadLabel(pm).toString().lowercase() }
-
-                // user installed apps only
-                apps = packageList.filter {
-                    (it.applicationInfo?.flags?.and(android.content.pm.ApplicationInfo.FLAG_SYSTEM) ?: 0) == 0
-                }.sortedBy { it.applicationInfo?.loadLabel(pm).toString().lowercase() }
-
-
-                loading = false
-            } catch (e: Exception) {
-                error = "Failed to load apps: ${e.message}"
-                loading = false
-            }
-        }
-    }
 
     Scaffold(
         topBar = {
@@ -107,7 +92,7 @@ fun HomeScreen() {
                 title = {
                     Text("Multi App Uninstaller")
                 })
-        }
+        }, containerColor = MaterialTheme.colorScheme.background
 
     ) { innerPadding ->
 
@@ -157,11 +142,11 @@ fun HomeScreen() {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                if (loading) {
+                if (appListLoading) {
                     CircularProgressIndicator(modifier = Modifier.padding(16.dp))
-                } else if (error != null) {
+                } else if (appListError != null) {
                     Text(
-                        text = error.orEmpty(), color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(16.dp)
+                        text = appListError.orEmpty(), color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(16.dp)
                     )
                 } else {
                     LazyColumn {
@@ -186,5 +171,11 @@ fun HomeScreen() {
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen()
+    val context = LocalContext.current
+    KoinApplication(application = {
+        androidContext(context)
+        modules(listOf(mainModule))
+    }) {
+        HomeScreen()
+    }
 }
