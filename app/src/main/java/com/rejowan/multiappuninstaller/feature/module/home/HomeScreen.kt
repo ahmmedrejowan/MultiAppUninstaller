@@ -41,7 +41,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -82,9 +85,9 @@ fun HomeScreen(
 
     var sortConfig by rememberSaveable { mutableStateOf(SortConfig()) }
 
-    val sortedApps by remember(appList, sortConfig) {
-        derivedStateOf { sortApps(appList, pm, sortConfig) }
-    }
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+
 
     var searchQuery by remember { mutableStateOf("") }
     var isSearch by remember { mutableStateOf(false) }
@@ -147,6 +150,7 @@ fun HomeScreen(
                             .padding(vertical = 6.dp, horizontal = 8.dp)
                             .fillMaxWidth()
                             .height(64.dp)
+                            .focusRequester(focusRequester)
                             .windowInsetsPadding(TopAppBarDefaults.windowInsets),
                         maxLines = 1,
                         shape = RoundedCornerShape(16.dp),
@@ -158,6 +162,7 @@ fun HomeScreen(
                             IconButton(onClick = {
                                 isSearch = !isSearch
                                 searchQuery = ""
+                                focusManager.clearFocus()
                             }) {
                                 Icon(
                                     Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back"
@@ -176,6 +181,12 @@ fun HomeScreen(
                         }
 
                     )
+
+                    LaunchedEffect(isSearch) {
+                        if (isSearch) {
+                            focusRequester.requestFocus()
+                        }
+                    }
 
 
                 }
@@ -221,8 +232,7 @@ fun HomeScreen(
                                 if (filteredApps.isEmpty()) {
 
                                     Box(
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentAlignment = Alignment.Center
+                                        modifier = Modifier.fillMaxSize()
                                     ) {
                                         Text(
                                             text = "No apps found",
