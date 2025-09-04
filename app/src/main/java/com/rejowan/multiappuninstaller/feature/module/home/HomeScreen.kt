@@ -115,7 +115,7 @@ fun HomeScreen(
                     Row(
                         modifier = Modifier
                             .padding(vertical = 2.dp)
-                            .height(72.dp)
+                            .height(80.dp)
                             .fillMaxWidth()
                             .windowInsetsPadding(TopAppBarDefaults.windowInsets),
                         verticalAlignment = Alignment.CenterVertically,
@@ -149,14 +149,15 @@ fun HomeScreen(
                         modifier = Modifier
                             .padding(vertical = 6.dp, horizontal = 8.dp)
                             .fillMaxWidth()
-                            .height(64.dp)
+                            .height(72.dp)
                             .focusRequester(focusRequester)
                             .windowInsetsPadding(TopAppBarDefaults.windowInsets),
                         maxLines = 1,
                         shape = RoundedCornerShape(16.dp),
                         border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.primary),
                         textStyle = MaterialTheme.typography.bodySmall.copy(
-                            fontSize = 12.sp
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurface
                         ),
                         leadingIcon = {
                             IconButton(onClick = {
