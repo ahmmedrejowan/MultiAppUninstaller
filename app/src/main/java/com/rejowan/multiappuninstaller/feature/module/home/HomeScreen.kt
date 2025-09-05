@@ -4,9 +4,12 @@ import COutlinedTextField
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -103,6 +106,11 @@ fun HomeScreen(
         }
     }
 
+    BackHandler {
+
+
+    }
+
 
     Scaffold(
         topBar = {
@@ -156,8 +164,7 @@ fun HomeScreen(
                         shape = RoundedCornerShape(16.dp),
                         border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.primary),
                         textStyle = MaterialTheme.typography.bodySmall.copy(
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurface
+                            fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface
                         ),
                         leadingIcon = {
                             IconButton(onClick = {
@@ -221,7 +228,17 @@ fun HomeScreen(
                     }
 
                     else -> {
-                        LazyColumn {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() }, indication = null
+                                ) {
+                                    if (searchQuery.isEmpty()) {
+                                        isSearch = false
+                                    }
+                                    focusManager.clearFocus()
+                                }) {
                             item {
                                 SortBar(
                                     sortConfig = sortConfig,
@@ -233,7 +250,9 @@ fun HomeScreen(
                                 if (filteredApps.isEmpty()) {
 
                                     Box(
-                                        modifier = Modifier.fillMaxSize()
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(top = 24.dp)
                                     ) {
                                         Text(
                                             text = "No apps found",
@@ -247,7 +266,6 @@ fun HomeScreen(
 
                                 }
                             }
-
 
                             items(
                                 items = filteredApps, key = { it.packageName }) { appInfo ->
