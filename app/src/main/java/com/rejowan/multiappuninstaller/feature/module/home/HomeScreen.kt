@@ -1,38 +1,14 @@
 package com.rejowan.multiappuninstaller.feature.module.home
 
-import COutlinedTextField
 import android.Manifest
+import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,18 +18,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.rejowan.multiappuninstaller.di.mainModule
-import com.rejowan.multiappuninstaller.feature.components.SingleAppInfoScreen
-import com.rejowan.multiappuninstaller.feature.components.SortBar
+import com.rejowan.multiappuninstaller.feature.module.home.component.AppTopBar
+import com.rejowan.multiappuninstaller.feature.module.home.component.HomeContent
 import com.rejowan.multiappuninstaller.utils.SortConfig
 import com.rejowan.multiappuninstaller.utils.sortApps
 import com.rejowan.multiappuninstaller.vm.MainViewModel
@@ -95,6 +67,8 @@ fun HomeScreen(
     var searchQuery by remember { mutableStateOf("") }
     var isSearch by remember { mutableStateOf(false) }
 
+    var showExitBottomSheet by remember { mutableStateOf(false) }
+
 
     val filteredApps by remember(appList, sortConfig, searchQuery) {
         derivedStateOf {
@@ -106,183 +80,59 @@ fun HomeScreen(
         }
     }
 
-    BackHandler {
+    BackHandler(enabled = true) {
+        if (isSearch && searchQuery.isEmpty()) {
+            isSearch = false
+            searchQuery = ""
+            focusManager.clearFocus()
+            return@BackHandler
+        }
 
+        if (!isSearch) {
+            showExitBottomSheet = true
+        }
 
     }
 
 
     Scaffold(
         topBar = {
-
-            Crossfade(
-                modifier = Modifier.animateContentSize(), targetState = isSearch, label = "Search"
-            ) { target ->
-                if (!target) {
-
-                    Row(
-                        modifier = Modifier
-                            .padding(vertical = 2.dp)
-                            .height(80.dp)
-                            .fillMaxWidth()
-                            .windowInsetsPadding(TopAppBarDefaults.windowInsets),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-
-                        Text(
-                            text = "Multi App Uninstaller",
-                            style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
-                            modifier = Modifier.padding(start = 16.dp)
-                        )
-
-                        Box(modifier = Modifier.weight(1f))
-
-                        IconButton(onClick = {
-                            isSearch = !isSearch
-                        }) {
-                            Icon(Icons.Filled.Search, contentDescription = "Search")
-                        }
-
+            AppTopBar(
+                isSearch = isSearch,
+                searchQuery = searchQuery,
+                onSearchQueryChange = { searchQuery = it },
+                onSearchToggle = {
+                    isSearch = !isSearch
+                    if (!isSearch) {
+                        searchQuery = ""
+                        focusManager.clearFocus()
                     }
-
-                } else {
-
-
-                    COutlinedTextField(
-                        value = searchQuery,
-                        onValueChange = { newValue ->
-                            searchQuery = newValue
-                        },
-                        hint = "Search apps...",
-                        modifier = Modifier
-                            .padding(vertical = 6.dp, horizontal = 8.dp)
-                            .fillMaxWidth()
-                            .height(72.dp)
-                            .focusRequester(focusRequester)
-                            .windowInsetsPadding(TopAppBarDefaults.windowInsets),
-                        maxLines = 1,
-                        shape = RoundedCornerShape(16.dp),
-                        border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.primary),
-                        textStyle = MaterialTheme.typography.bodySmall.copy(
-                            fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface
-                        ),
-                        leadingIcon = {
-                            IconButton(onClick = {
-                                isSearch = !isSearch
-                                searchQuery = ""
-                                focusManager.clearFocus()
-                            }) {
-                                Icon(
-                                    Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back"
-                                )
-                            }
-
-                        },
-                        trailingIcon = if (searchQuery.isNotBlank()) {
-                            {
-                                IconButton(onClick = { searchQuery = "" }) {
-                                    Icon(Icons.Filled.Close, contentDescription = "Clear")
-                                }
-                            }
-                        } else {
-                            null
-                        }
-
-                    )
-
-                    LaunchedEffect(isSearch) {
-                        if (isSearch) {
-                            focusRequester.requestFocus()
-                        }
-                    }
-
-
-                }
-            }
+                },
+                onSettingsClick = { /* Handle settings click */ },
+                focusRequester = focusRequester
+            )
         },
 
         containerColor = MaterialTheme.colorScheme.background,
 
         ) { innerPadding ->
 
-        Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
-
-            Column(modifier = Modifier.fillMaxSize()) {
-
-
-                when {
-                    appListLoading -> {
-                        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
-                    }
-
-                    appListError != null -> {
-                        Text(
-                            text = appListError.orEmpty(),
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-
-                    else -> {
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clickable(
-                                    interactionSource = remember { MutableInteractionSource() }, indication = null
-                                ) {
-                                    if (searchQuery.isEmpty()) {
-                                        isSearch = false
-                                    }
-                                    focusManager.clearFocus()
-                                }) {
-                            item {
-                                SortBar(
-                                    sortConfig = sortConfig,
-                                    onChange = { sortConfig = it },
-                                )
-                            }
-
-                            item {
-                                if (filteredApps.isEmpty()) {
-
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(top = 24.dp)
-                                    ) {
-                                        Text(
-                                            text = "No apps found",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            modifier = Modifier
-                                                .padding(16.dp)
-                                                .align(Alignment.Center)
-                                        )
-                                    }
-
-                                }
-                            }
-
-                            items(
-                                items = filteredApps, key = { it.packageName }) { appInfo ->
-                                SingleAppInfoScreen(packageInfo = appInfo)
-                            }
-
-
-                        }
-                    }
-                }
-            }
-
-        }
+        HomeContent(
+            appListLoading = appListLoading,
+            appListError = appListError,
+            filteredApps = filteredApps,
+            sortConfig = sortConfig,
+            onSortConfigChange = { sortConfig = it },
+            isSearch = isSearch,
+            searchQuery = searchQuery,
+            onSearchToggle = { isSearch = false },
+            focusManager = focusManager,
+            modifier = Modifier.padding(innerPadding),
+            showExitBottomSheet = showExitBottomSheet,
+            onDismissExitBottomSheet = { showExitBottomSheet = false },
+            onExit = { (context as? Activity)?.finish() })
 
     }
-
-
 }
 
 
