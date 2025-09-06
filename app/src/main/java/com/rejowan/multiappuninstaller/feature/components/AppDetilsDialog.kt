@@ -3,7 +3,12 @@ package com.rejowan.multiappuninstaller.feature.components
 import android.content.pm.PackageInfo
 import android.os.Build
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
@@ -24,8 +29,7 @@ import java.io.File
 
 @Composable
 fun AppDetailsDialog(
-    packageInfo: PackageInfo,
-    onDismiss: () -> Unit
+    packageInfo: PackageInfo, onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -44,8 +48,7 @@ fun AppDetailsDialog(
     val versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
         packageInfo.longVersionCode.toString()
     } else {
-        @Suppress("DEPRECATION")
-        packageInfo.versionCode.toString()
+        @Suppress("DEPRECATION") packageInfo.versionCode.toString()
     }
     val minSdk = packageInfo.applicationInfo?.minSdkVersion?.toString() ?: "Unknown"
     val targetSdk = packageInfo.applicationInfo?.targetSdkVersion?.toString() ?: "Unknown"
@@ -53,63 +56,58 @@ fun AppDetailsDialog(
         context.packageManager.getInstallerPackageName(packageName)
     }.getOrNull() ?: "Unknown"
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Close") }
-        },
-        text = {
+    AlertDialog(onDismissRequest = onDismiss, confirmButton = {
+        TextButton(onClick = onDismiss) { Text("Close") }
+    }, text = {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Centered icon
+            appIcon?.let {
+                Image(
+                    painter = BitmapPainter(it.toBitmap().asImageBitmap()),
+                    contentDescription = appName,
+                    modifier = Modifier
+                        .size(64.dp)
+                        .padding(top = 4.dp, bottom = 8.dp)
+                )
+            }
+
+            // Centered app name
+            Text(
+                text = appName,
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp)
+            )
+
+            // Left-aligned details
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(horizontal = 4.dp)
             ) {
-                // Centered icon
-                appIcon?.let {
-                    Image(
-                        painter = BitmapPainter(it.toBitmap().asImageBitmap()),
-                        contentDescription = appName,
-                        modifier = Modifier
-                            .size(64.dp)
-                            .padding(top = 4.dp, bottom = 8.dp)
-                    )
-                }
-
-                // Centered app name
-                Text(
-                    text = appName,
-                    style = MaterialTheme.typography.titleMedium,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 12.dp)
-                )
-
-                // Left-aligned details
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 4.dp)
-                ) {
-                    InfoBlock(label = "Package Name", value = packageName)
-                    InfoBlock(label = "Version Info", value = "$versionName ($versionCode)")
-                    InfoBlock(label = "App Size", value = sizeStr)
-                    InfoBlock(label = "First Installed", value = installDate)
-                    InfoBlock(label = "Last Updated", value = updateDate)
-                    InfoBlock(label = "Min SDK", value = minSdk)
-                    InfoBlock(label = "Target SDK", value = targetSdk)
-                    InfoBlock(label = "Installer Package", value = installer)
-                }
+                InfoBlock(label = "Package Name", value = packageName)
+                InfoBlock(label = "Version Info", value = "$versionName ($versionCode)")
+                InfoBlock(label = "App Size", value = sizeStr)
+                InfoBlock(label = "First Installed", value = installDate)
+                InfoBlock(label = "Last Updated", value = updateDate)
+                InfoBlock(label = "Min SDK", value = minSdk)
+                InfoBlock(label = "Target SDK", value = targetSdk)
+                InfoBlock(label = "Installer Package", value = installer)
             }
         }
-    )
+    })
 }
 
 @Composable
 private fun InfoBlock(
-    label: String,
-    value: String
+    label: String, value: String
 ) {
     Column(
         modifier = Modifier
@@ -117,15 +115,11 @@ private fun InfoBlock(
             .padding(vertical = 6.dp)
     ) {
         Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            text = label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(Modifier.height(2.dp))
         Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface
+            text = value, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

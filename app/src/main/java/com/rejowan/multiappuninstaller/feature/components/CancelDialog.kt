@@ -1,4 +1,4 @@
-package com.rejowan.multiappuninstaller.feature.module.home.component
+package com.rejowan.multiappuninstaller.feature.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,7 +16,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ExitConfirmationDialog(
+fun CancelConfirmationDialog(
+    totalSelectedApps : Int,
     onCancel: () -> Unit,
     onExit: () -> Unit
 ) {
@@ -27,15 +28,15 @@ fun ExitConfirmationDialog(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Exit App",
+            text = "Exit Selection Mode",
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(bottom = 8.dp)
         )
         Text(
-            text = "Are you sure you want to exit?",
+            text = "You have $totalSelectedApps apps selected. Upon exiting your selection will be cleared.",
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 2.dp)
         )
         Row(
             modifier = Modifier

@@ -1,7 +1,7 @@
 package com.rejowan.multiappuninstaller.feature.module.home.component
 
+import android.content.pm.PackageInfo
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,9 +22,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.unit.dp
 import com.rejowan.multiappuninstaller.feature.components.AppDetailsDialog
+import com.rejowan.multiappuninstaller.feature.components.CancelConfirmationDialog
+import com.rejowan.multiappuninstaller.feature.components.ExitConfirmationDialog
 import com.rejowan.multiappuninstaller.feature.components.SingleAppInfoScreen
 import com.rejowan.multiappuninstaller.feature.components.SortBar
 import com.rejowan.multiappuninstaller.utils.SortConfig
@@ -34,13 +36,13 @@ import com.rejowan.multiappuninstaller.utils.SortConfig
 fun HomeContent(
     appListLoading: Boolean,
     appListError: String?,
-    filteredApps: List<android.content.pm.PackageInfo>,
+    filteredApps: List<PackageInfo>,
     sortConfig: SortConfig,
     onSortConfigChange: (SortConfig) -> Unit,
     isSearch: Boolean,
     searchQuery: String,
     onSearchToggle: () -> Unit,
-    focusManager: androidx.compose.ui.focus.FocusManager,
+    focusManager: FocusManager,
     isSelecting: Boolean,
     selectedApps: Set<String>,
     onToggleSelection: (String) -> Unit,
@@ -48,11 +50,14 @@ fun HomeContent(
     modifier: Modifier = Modifier,
     showExitBottomSheet: Boolean,
     onDismissExitBottomSheet: () -> Unit,
-    onExit: () -> Unit
+    onDismissCancelConfirmationDialog: () -> Unit,
+    onExit: () -> Unit,
+    onExitCancelConfirmationDialog: () -> Unit,
+    showCancelConfirmationDialog: Boolean
 ) {
 
 
-    var detailsFor by remember { mutableStateOf<android.content.pm.PackageInfo?>(null) }
+    var detailsFor by remember { mutableStateOf<PackageInfo?>(null) }
 
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -113,8 +118,7 @@ fun HomeContent(
                                 onStartSelection = { onStartSelection(appInfo.packageName) },
                                 onNormalClick = {
                                     detailsFor = appInfo
-                                }
-                            )
+                                })
                         }
 
                     }
@@ -130,12 +134,23 @@ fun HomeContent(
             }
         }
 
+        if (showCancelConfirmationDialog){
+            ModalBottomSheet(onDismissRequest = onDismissCancelConfirmationDialog) {
+                CancelConfirmationDialog(
+                    totalSelectedApps = selectedApps.size,
+                    onCancel = onDismissCancelConfirmationDialog,
+                    onExit = onExitCancelConfirmationDialog
+                )
+
+            }
+        }
+
         detailsFor?.let { pkg ->
             AppDetailsDialog(
-                packageInfo = pkg,
-                onDismiss = { detailsFor = null }
-            )
+                packageInfo = pkg, onDismiss = { detailsFor = null })
         }
+
+
 
     }
 }

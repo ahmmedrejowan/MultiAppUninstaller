@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import com.rejowan.multiappuninstaller.di.mainModule
+import com.rejowan.multiappuninstaller.feature.components.SelectionBottomBar
 import com.rejowan.multiappuninstaller.feature.module.home.component.AppTopBar
 import com.rejowan.multiappuninstaller.feature.module.home.component.HomeContent
 import com.rejowan.multiappuninstaller.utils.SortConfig
@@ -69,28 +70,12 @@ fun HomeScreen(
     var isSearch by remember { mutableStateOf(false) }
 
     var showExitBottomSheet by remember { mutableStateOf(false) }
+    var showCancelConfirmationDialog by remember { mutableStateOf(false) }
 
     var isSelecting by rememberSaveable { mutableStateOf(false) }
 
-    val SetSaver = listSaver<Set<String>, String>(save = { it.toList() }, restore = { it.toSet() })
-    var selectedApps by rememberSaveable(stateSaver = SetSaver) { mutableStateOf(emptySet<String>()) }
-
-    fun startSelection(packageName: String) {
-        isSelecting = true
-        selectedApps = setOf(packageName)
-    }
-
-    fun toggleSelection(packageName: String) {
-        val next = selectedApps.toMutableSet().apply {
-            if (contains(packageName)) remove(packageName) else add(packageName)
-        }.toSet()
-
-        selectedApps = next
-        if (next.isEmpty()) {
-            // auto-exit when nothing is selected
-            isSelecting = false
-        }
-    }
+    val setSaver = listSaver<Set<String>, String>(save = { it.toList() }, restore = { it.toSet() })
+    var selectedApps by rememberSaveable(stateSaver = setSaver) { mutableStateOf(emptySet<String>()) }
 
 
     val filteredApps by remember(appList, sortConfig, searchQuery) {
@@ -103,30 +88,24 @@ fun HomeScreen(
         }
     }
 
-//    BackHandler(enabled = true) {
-//        if (isSearch && searchQuery.isEmpty()) {
-//            isSearch = false
-//            searchQuery = ""
-//            focusManager.clearFocus()
-//            return@BackHandler
-//        }
-//
-//        if (!isSearch) {
-//            showExitBottomSheet = true
-//        }
-//
-//    }
+    fun currentAllPackages(): Set<String> = filteredApps.map { it.packageName }.toSet()
+
+
     BackHandler(enabled = true) {
         when {
-            isSelecting -> {
-                isSelecting = false
-                selectedApps = emptySet()
-            }
-
             isSearch -> {
                 isSearch = false
                 searchQuery = ""
                 focusManager.clearFocus()
+            }
+
+            isSelecting -> {
+                if (selectedApps.isNotEmpty()) {
+                    showCancelConfirmationDialog = true
+                } else {
+                    isSelecting = false
+                    selectedApps = emptySet()
+                }
             }
 
             else -> showExitBottomSheet = true
@@ -152,6 +131,42 @@ fun HomeScreen(
             )
         },
 
+        bottomBar = {
+            val total = filteredApps.size
+            val allVisiblePkgs = currentAllPackages()
+            val allSelected = selectedApps.containsAll(allVisiblePkgs) && allVisiblePkgs.isNotEmpty()
+
+            SelectionBottomBar(
+                visible = isSelecting,
+                selectedCount = selectedApps.size,
+                totalCount = total,
+                allSelected = allSelected,
+                onToggleSelectAll = {
+                    if (allSelected) {
+                        selectedApps = selectedApps - allVisiblePkgs
+                    } else {
+                        selectedApps = selectedApps + allVisiblePkgs
+                        isSelecting = true
+                    }
+                },
+                onCancel = {
+                    if (selectedApps.isNotEmpty()) {
+                        showCancelConfirmationDialog = true
+                    } else {
+                        isSelecting = false
+                        selectedApps = emptySet()
+                    }
+
+                },
+                onUninstall = {
+                    // TODO: hook into your uninstall flow
+                    // e.g., mainViewModel.requestUninstall(selectedApps.toList())
+                    // For now just close selection:
+                    // isSelecting = false
+                    // selectedApps = emptySet()
+                })
+        },
+
         containerColor = MaterialTheme.colorScheme.background,
 
         ) { innerPadding ->
@@ -168,6 +183,7 @@ fun HomeScreen(
             focusManager = focusManager,
             modifier = Modifier.padding(innerPadding),
             showExitBottomSheet = showExitBottomSheet,
+            showCancelConfirmationDialog = showCancelConfirmationDialog,
             onDismissExitBottomSheet = { showExitBottomSheet = false },
             onExit = { (context as? Activity)?.finish() },
             isSelecting = isSelecting,
@@ -178,13 +194,16 @@ fun HomeScreen(
                 } else {
                     selectedApps + packageName
                 }
-                if (selectedApps.isEmpty()) {
-                    isSelecting = false
-                }
             },
             onStartSelection = { packageName ->
                 isSelecting = true
                 selectedApps = setOf(packageName)
+            },
+            onDismissCancelConfirmationDialog = { showCancelConfirmationDialog = false },
+            onExitCancelConfirmationDialog = {
+                isSelecting = false
+                selectedApps = emptySet()
+                showCancelConfirmationDialog = false
             },
         )
 

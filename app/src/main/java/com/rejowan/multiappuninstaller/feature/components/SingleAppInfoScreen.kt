@@ -65,8 +65,9 @@ fun SingleAppInfoScreen(
             }, onLongClick = {
                 if (!isSelecting) onStartSelection?.invoke() else onToggle()
             }), shape = RoundedCornerShape(8.dp), colors = CardDefaults.elevatedCardColors().copy(
-        containerColor = if (isSelected) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface
-    )) {
+            containerColor = if (isSelected) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface
+        )
+    ) {
 
         Row(
             modifier = Modifier.padding(4.dp)
