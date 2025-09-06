@@ -16,6 +16,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -69,6 +70,28 @@ fun HomeScreen(
 
     var showExitBottomSheet by remember { mutableStateOf(false) }
 
+    var isSelecting by rememberSaveable { mutableStateOf(false) }
+
+    val SetSaver = listSaver<Set<String>, String>(save = { it.toList() }, restore = { it.toSet() })
+    var selectedApps by rememberSaveable(stateSaver = SetSaver) { mutableStateOf(emptySet<String>()) }
+
+    fun startSelection(packageName: String) {
+        isSelecting = true
+        selectedApps = setOf(packageName)
+    }
+
+    fun toggleSelection(packageName: String) {
+        val next = selectedApps.toMutableSet().apply {
+            if (contains(packageName)) remove(packageName) else add(packageName)
+        }.toSet()
+
+        selectedApps = next
+        if (next.isEmpty()) {
+            // auto-exit when nothing is selected
+            isSelecting = false
+        }
+    }
+
 
     val filteredApps by remember(appList, sortConfig, searchQuery) {
         derivedStateOf {
@@ -80,18 +103,34 @@ fun HomeScreen(
         }
     }
 
+//    BackHandler(enabled = true) {
+//        if (isSearch && searchQuery.isEmpty()) {
+//            isSearch = false
+//            searchQuery = ""
+//            focusManager.clearFocus()
+//            return@BackHandler
+//        }
+//
+//        if (!isSearch) {
+//            showExitBottomSheet = true
+//        }
+//
+//    }
     BackHandler(enabled = true) {
-        if (isSearch && searchQuery.isEmpty()) {
-            isSearch = false
-            searchQuery = ""
-            focusManager.clearFocus()
-            return@BackHandler
-        }
+        when {
+            isSelecting -> {
+                isSelecting = false
+                selectedApps = emptySet()
+            }
 
-        if (!isSearch) {
-            showExitBottomSheet = true
-        }
+            isSearch -> {
+                isSearch = false
+                searchQuery = ""
+                focusManager.clearFocus()
+            }
 
+            else -> showExitBottomSheet = true
+        }
     }
 
 
@@ -130,7 +169,24 @@ fun HomeScreen(
             modifier = Modifier.padding(innerPadding),
             showExitBottomSheet = showExitBottomSheet,
             onDismissExitBottomSheet = { showExitBottomSheet = false },
-            onExit = { (context as? Activity)?.finish() })
+            onExit = { (context as? Activity)?.finish() },
+            isSelecting = isSelecting,
+            selectedApps = selectedApps,
+            onToggleSelection = { packageName ->
+                selectedApps = if (selectedApps.contains(packageName)) {
+                    selectedApps - packageName
+                } else {
+                    selectedApps + packageName
+                }
+                if (selectedApps.isEmpty()) {
+                    isSelecting = false
+                }
+            },
+            onStartSelection = { packageName ->
+                isSelecting = true
+                selectedApps = setOf(packageName)
+            },
+        )
 
     }
 }

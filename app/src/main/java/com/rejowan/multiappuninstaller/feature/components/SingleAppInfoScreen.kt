@@ -2,6 +2,7 @@ package com.rejowan.multiappuninstaller.feature.components
 
 import android.content.pm.PackageInfo
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,8 +11,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
@@ -30,7 +34,13 @@ import java.io.File
 
 @Composable
 fun SingleAppInfoScreen(
-    packageInfo: PackageInfo
+    modifier: Modifier = Modifier,
+    packageInfo: PackageInfo,
+    isSelecting: Boolean = false,
+    isSelected: Boolean = false,
+    onToggle: () -> Unit = {},
+    onStartSelection: (() -> Unit)? = null,
+    onNormalClick: (() -> Unit)? = null,
 ) {
 
     val context = LocalContext.current
@@ -47,17 +57,19 @@ fun SingleAppInfoScreen(
 
 
     ElevatedCard(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 2.dp, horizontal = 8.dp),
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.elevatedCardColors().copy(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
-    ) {
+            .padding(vertical = 2.dp, horizontal = 8.dp)
+            .combinedClickable(onClick = {
+                if (isSelecting) onToggle() else onNormalClick?.invoke()
+            }, onLongClick = {
+                if (!isSelecting) onStartSelection?.invoke() else onToggle()
+            }), shape = RoundedCornerShape(8.dp), colors = CardDefaults.elevatedCardColors().copy(
+        containerColor = if (isSelected) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface
+    )) {
 
         Row(
-            modifier = Modifier.padding(4.dp), verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.padding(4.dp)
         ) {
 
             if (appIcon != null) {
@@ -89,7 +101,7 @@ fun SingleAppInfoScreen(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
 
-                    if (installDate == updateDate){
+                    if (installDate == updateDate) {
                         Column {
                             Text(
                                 text = installDate,
@@ -124,7 +136,9 @@ fun SingleAppInfoScreen(
                         }
 
                         VerticalDivider(
-                            modifier = Modifier.height(8.dp).padding(horizontal = 4.dp)
+                            modifier = Modifier
+                                .height(8.dp)
+                                .padding(horizontal = 4.dp)
                         )
 
                         Column {
@@ -150,6 +164,17 @@ fun SingleAppInfoScreen(
 
             }
 
+            if (isSelected) {
+
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = "Checked",
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+
+
+            }
+
         }
 
     }
@@ -166,5 +191,22 @@ fun SingleAppInfoScreenPreview() {
     dummyPackageInfo.packageName = "com.example.app"
     dummyPackageInfo.firstInstallTime = System.currentTimeMillis()
 
-    SingleAppInfoScreen(dummyPackageInfo)
+    SingleAppInfoScreen(
+        packageInfo = dummyPackageInfo, isSelecting = true, isSelected = true
+    )
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun SingleAppInfoScreenPreview2() {
+    val dummyPackageInfo = PackageInfo()
+
+    dummyPackageInfo.versionName = "1.0.0"
+    dummyPackageInfo.packageName = "com.example.app"
+    dummyPackageInfo.firstInstallTime = System.currentTimeMillis()
+
+    SingleAppInfoScreen(
+        packageInfo = dummyPackageInfo, isSelecting = true, isSelected = false
+    )
 }

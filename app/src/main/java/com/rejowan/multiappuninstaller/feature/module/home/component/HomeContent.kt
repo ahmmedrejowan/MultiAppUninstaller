@@ -1,6 +1,7 @@
 package com.rejowan.multiappuninstaller.feature.module.home.component
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.rejowan.multiappuninstaller.feature.components.SingleAppInfoScreen
 import com.rejowan.multiappuninstaller.feature.components.SortBar
@@ -35,6 +37,10 @@ fun HomeContent(
     searchQuery: String,
     onSearchToggle: () -> Unit,
     focusManager: androidx.compose.ui.focus.FocusManager,
+    isSelecting: Boolean,
+    selectedApps: Set<String>,
+    onToggleSelection: (String) -> Unit,
+    onStartSelection: (String) -> Unit,
     modifier: Modifier = Modifier,
     showExitBottomSheet: Boolean,
     onDismissExitBottomSheet: () -> Unit,
@@ -46,29 +52,26 @@ fun HomeContent(
                 appListLoading -> {
                     CircularProgressIndicator(modifier = Modifier.padding(16.dp))
                 }
+
                 appListError != null -> {
                     Text(
-                        text = appListError,
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(16.dp)
+                        text = appListError, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(16.dp)
                     )
                 }
+
                 else -> {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
                             .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null
+                                interactionSource = remember { MutableInteractionSource() }, indication = null
                             ) {
                                 if (searchQuery.isEmpty()) onSearchToggle()
                                 focusManager.clearFocus()
-                            }
-                    ) {
+                            }) {
                         item {
                             SortBar(
-                                sortConfig = sortConfig,
-                                onChange = onSortConfigChange
+                                sortConfig = sortConfig, onChange = onSortConfigChange
                             )
                         }
                         item {
@@ -90,8 +93,19 @@ fun HomeContent(
                             }
                         }
                         items(items = filteredApps, key = { it.packageName }) { appInfo ->
-                            SingleAppInfoScreen(packageInfo = appInfo)
+
+                            val isSelected = selectedApps.contains(appInfo.packageName)
+
+                            SingleAppInfoScreen(
+                                packageInfo = appInfo,
+                                isSelecting = isSelecting,
+                                isSelected = isSelected,
+                                onToggle = { onToggleSelection(appInfo.packageName) },
+                                onStartSelection = { onStartSelection(appInfo.packageName) },
+                                onNormalClick = { /* open details if you want */ }
+                            )
                         }
+
                     }
                 }
             }
@@ -100,8 +114,7 @@ fun HomeContent(
         if (showExitBottomSheet) {
             ModalBottomSheet(onDismissRequest = onDismissExitBottomSheet) {
                 ExitConfirmationDialog(
-                    onCancel = onDismissExitBottomSheet,
-                    onExit = onExit
+                    onCancel = onDismissExitBottomSheet, onExit = onExit
                 )
             }
         }
