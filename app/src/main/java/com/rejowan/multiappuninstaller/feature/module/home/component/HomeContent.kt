@@ -16,11 +16,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import com.rejowan.multiappuninstaller.feature.components.AppDetailsDialog
 import com.rejowan.multiappuninstaller.feature.components.SingleAppInfoScreen
 import com.rejowan.multiappuninstaller.feature.components.SortBar
 import com.rejowan.multiappuninstaller.utils.SortConfig
@@ -46,6 +50,11 @@ fun HomeContent(
     onDismissExitBottomSheet: () -> Unit,
     onExit: () -> Unit
 ) {
+
+
+    var detailsFor by remember { mutableStateOf<android.content.pm.PackageInfo?>(null) }
+
+
     Box(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
             when {
@@ -102,7 +111,9 @@ fun HomeContent(
                                 isSelected = isSelected,
                                 onToggle = { onToggleSelection(appInfo.packageName) },
                                 onStartSelection = { onStartSelection(appInfo.packageName) },
-                                onNormalClick = { /* open details if you want */ }
+                                onNormalClick = {
+                                    detailsFor = appInfo
+                                }
                             )
                         }
 
@@ -118,5 +129,13 @@ fun HomeContent(
                 )
             }
         }
+
+        detailsFor?.let { pkg ->
+            AppDetailsDialog(
+                packageInfo = pkg,
+                onDismiss = { detailsFor = null }
+            )
+        }
+
     }
 }
