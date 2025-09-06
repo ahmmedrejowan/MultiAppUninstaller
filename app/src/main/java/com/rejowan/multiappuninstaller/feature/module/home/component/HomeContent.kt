@@ -26,6 +26,7 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.unit.dp
 import com.rejowan.multiappuninstaller.feature.components.AppDetailsDialog
 import com.rejowan.multiappuninstaller.feature.components.CancelConfirmationDialog
+import com.rejowan.multiappuninstaller.feature.components.ConfirmUninstallDialog
 import com.rejowan.multiappuninstaller.feature.components.ExitConfirmationDialog
 import com.rejowan.multiappuninstaller.feature.components.SingleAppInfoScreen
 import com.rejowan.multiappuninstaller.feature.components.SortBar
@@ -53,7 +54,10 @@ fun HomeContent(
     onDismissCancelConfirmationDialog: () -> Unit,
     onExit: () -> Unit,
     onExitCancelConfirmationDialog: () -> Unit,
-    showCancelConfirmationDialog: Boolean
+    showCancelConfirmationDialog: Boolean,
+    showUninstallConfirmationDialog: Boolean,
+    onDismissUninstallConfirmationDialog: () -> Unit,
+    onConfirmUninstall: () -> Unit,
 ) {
 
 
@@ -134,7 +138,7 @@ fun HomeContent(
             }
         }
 
-        if (showCancelConfirmationDialog){
+        if (showCancelConfirmationDialog) {
             ModalBottomSheet(onDismissRequest = onDismissCancelConfirmationDialog) {
                 CancelConfirmationDialog(
                     totalSelectedApps = selectedApps.size,
@@ -145,11 +149,21 @@ fun HomeContent(
             }
         }
 
+        if (showUninstallConfirmationDialog) {
+
+            val selectedAppInfos = filteredApps.filter { selectedApps.contains(it.packageName) }
+
+            ConfirmUninstallDialog(
+                selectedPackages = selectedAppInfos,
+                onDismiss = onDismissUninstallConfirmationDialog,
+                onConfirmUninstall = onConfirmUninstall
+            )
+        }
+
         detailsFor?.let { pkg ->
             AppDetailsDialog(
                 packageInfo = pkg, onDismiss = { detailsFor = null })
         }
-
 
 
     }

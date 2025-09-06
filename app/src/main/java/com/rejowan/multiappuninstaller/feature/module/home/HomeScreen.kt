@@ -71,6 +71,8 @@ fun HomeScreen(
 
     var showExitBottomSheet by remember { mutableStateOf(false) }
     var showCancelConfirmationDialog by remember { mutableStateOf(false) }
+    var showUninstallConfirm by remember { mutableStateOf(false) }
+
 
     var isSelecting by rememberSaveable { mutableStateOf(false) }
 
@@ -159,11 +161,7 @@ fun HomeScreen(
 
                 },
                 onUninstall = {
-                    // TODO: hook into your uninstall flow
-                    // e.g., mainViewModel.requestUninstall(selectedApps.toList())
-                    // For now just close selection:
-                    // isSelecting = false
-                    // selectedApps = emptySet()
+                    showUninstallConfirm = true
                 })
         },
 
@@ -204,6 +202,13 @@ fun HomeScreen(
                 isSelecting = false
                 selectedApps = emptySet()
                 showCancelConfirmationDialog = false
+            },
+            showUninstallConfirmationDialog = showUninstallConfirm,
+            onDismissUninstallConfirmationDialog = {
+                showUninstallConfirm = false
+            },
+            onConfirmUninstall = {
+                showUninstallConfirm = false
             },
         )
 
