@@ -40,8 +40,7 @@ import java.io.File
 @Composable
 fun AppDetailsDialog(
     packageInfo: PackageInfo,
-    onDismiss: () -> Unit,
-    onSingleUninstall: (PackageInfo) -> Unit
+    onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -78,7 +77,7 @@ fun AppDetailsDialog(
                     addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
                 context.startActivity(intent)
-                onSingleUninstall(packageInfo)
+                onDismiss()
             }) {
             Text("Uninstall", color = MaterialTheme.colorScheme.error)
         }

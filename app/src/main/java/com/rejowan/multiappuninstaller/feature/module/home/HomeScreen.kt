@@ -229,9 +229,6 @@ fun HomeScreen(
             onConfirmUninstall = {
                 showUninstallConfirm = false
                 // proceed to uninstall
-            },
-            onSingleUninstall = { packageInfo ->
-                // uninstall is prompt for this package
             }
         )
 
