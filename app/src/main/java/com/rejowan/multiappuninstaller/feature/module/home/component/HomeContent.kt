@@ -58,6 +58,7 @@ fun HomeContent(
     showUninstallConfirmationDialog: Boolean,
     onDismissUninstallConfirmationDialog: () -> Unit,
     onConfirmUninstall: () -> Unit,
+    onSingleUninstall: (PackageInfo) -> Unit
 ) {
 
 
@@ -162,7 +163,13 @@ fun HomeContent(
 
         detailsFor?.let { pkg ->
             AppDetailsDialog(
-                packageInfo = pkg, onDismiss = { detailsFor = null })
+                packageInfo = pkg,
+                onDismiss = { detailsFor = null },
+                onSingleUninstall = {
+                    detailsFor = null
+                    onSingleUninstall(it)
+                }
+                )
         }
 
 

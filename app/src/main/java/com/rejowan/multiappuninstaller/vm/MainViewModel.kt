@@ -36,6 +36,10 @@ class MainViewModel(
         }
     }
 
+    fun removeAppByPackageName(packageName: String) {
+        _apps.value = _apps.value.filterNot { it.packageName == packageName }
+    }
+
     fun setError(message: String) {
         _error.value = message
     }

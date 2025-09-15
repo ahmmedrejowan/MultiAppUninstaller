@@ -2,6 +2,8 @@ package com.rejowan.multiappuninstaller.feature.module.home
 
 import android.Manifest
 import android.app.Activity
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.BackHandler
@@ -10,6 +12,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -28,6 +31,7 @@ import com.rejowan.multiappuninstaller.di.mainModule
 import com.rejowan.multiappuninstaller.feature.components.SelectionBottomBar
 import com.rejowan.multiappuninstaller.feature.module.home.component.AppTopBar
 import com.rejowan.multiappuninstaller.feature.module.home.component.HomeContent
+import com.rejowan.multiappuninstaller.receivers.AppUninstallReceiver
 import com.rejowan.multiappuninstaller.utils.SortConfig
 import com.rejowan.multiappuninstaller.utils.sortApps
 import com.rejowan.multiappuninstaller.vm.MainViewModel
@@ -48,13 +52,28 @@ fun HomeScreen(
     val appListError by mainViewModel.error.collectAsState()
     val appListLoading by mainViewModel.loading.collectAsState()
 
-    val hasPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+    val hasPackagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         context.checkSelfPermission(Manifest.permission.QUERY_ALL_PACKAGES) == PackageManager.PERMISSION_GRANTED
     } else {
         true
     }
 
-    if (!hasPermission) {
+    val onAppUninstalled: (String) -> Unit = { packageName ->
+        mainViewModel.removeAppByPackageName(packageName)
+    }
+
+    val appUninstallReceiver = remember { AppUninstallReceiver(onAppUninstalled) }
+
+    DisposableEffect(context) {
+        val filter = IntentFilter(Intent.ACTION_PACKAGE_REMOVED)
+        filter.addDataScheme("package")
+        context.registerReceiver(appUninstallReceiver, filter)
+        onDispose {
+            context.unregisterReceiver(appUninstallReceiver)
+        }
+    }
+
+    if (!hasPackagePermission) {
         LaunchedEffect(Unit) { mainViewModel.setError("Permission not granted to access app list.") }
     } else {
         LaunchedEffect(Unit) { mainViewModel.loadApps() }
@@ -209,7 +228,11 @@ fun HomeScreen(
             },
             onConfirmUninstall = {
                 showUninstallConfirm = false
+                // proceed to uninstall
             },
+            onSingleUninstall = { packageInfo ->
+                // uninstall is prompt for this package
+            }
         )
 
     }
