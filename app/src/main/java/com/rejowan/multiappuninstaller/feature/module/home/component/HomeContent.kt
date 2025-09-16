@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.unit.dp
 import com.rejowan.multiappuninstaller.feature.components.AppDetailsDialog
+import com.rejowan.multiappuninstaller.feature.components.BatchUninstallResultDialog
 import com.rejowan.multiappuninstaller.feature.components.CancelConfirmationDialog
 import com.rejowan.multiappuninstaller.feature.components.ConfirmUninstallDialog
 import com.rejowan.multiappuninstaller.feature.components.ExitConfirmationDialog
@@ -57,8 +58,12 @@ fun HomeContent(
     showCancelConfirmationDialog: Boolean,
     showUninstallConfirmationDialog: Boolean,
     onDismissUninstallConfirmationDialog: () -> Unit,
-    onConfirmUninstall: () -> Unit
-) {
+    onConfirmUninstall: () -> Unit,
+    showBatchResultDialog: Boolean,
+    totalSelectedAtStart: Int,
+    succeededCount: Int,
+    failedPackages: List<String>,
+    onDismissUninstallResultDialog: () -> Unit, ) {
 
 
     var detailsFor by remember { mutableStateOf<PackageInfo?>(null) }
@@ -159,6 +164,16 @@ fun HomeContent(
                 onConfirmUninstall = onConfirmUninstall
             )
         }
+
+        if (showBatchResultDialog) {
+            BatchUninstallResultDialog(
+                totalSelected = totalSelectedAtStart,
+                succeededCount = succeededCount,
+                failedPackages = failedPackages,
+                onDismiss = onDismissUninstallResultDialog
+            )
+        }
+
 
         detailsFor?.let { pkg ->
             AppDetailsDialog(

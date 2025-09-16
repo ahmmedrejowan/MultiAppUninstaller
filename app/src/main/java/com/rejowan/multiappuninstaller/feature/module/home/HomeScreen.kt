@@ -4,7 +4,9 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
@@ -27,6 +29,9 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.rejowan.multiappuninstaller.di.mainModule
 import com.rejowan.multiappuninstaller.feature.components.SelectionBottomBar
 import com.rejowan.multiappuninstaller.feature.module.home.component.AppTopBar
@@ -58,26 +63,6 @@ fun HomeScreen(
         true
     }
 
-    val onAppUninstalled: (String) -> Unit = { packageName ->
-        mainViewModel.removeAppByPackageName(packageName)
-    }
-
-    val appUninstallReceiver = remember { AppUninstallReceiver(onAppUninstalled) }
-
-    DisposableEffect(context) {
-        val filter = IntentFilter(Intent.ACTION_PACKAGE_REMOVED)
-        filter.addDataScheme("package")
-        context.registerReceiver(appUninstallReceiver, filter)
-        onDispose {
-            context.unregisterReceiver(appUninstallReceiver)
-        }
-    }
-
-    if (!hasPackagePermission) {
-        LaunchedEffect(Unit) { mainViewModel.setError("Permission not granted to access app list.") }
-    } else {
-        LaunchedEffect(Unit) { mainViewModel.loadApps() }
-    }
 
     var sortConfig by rememberSaveable { mutableStateOf(SortConfig()) }
 
@@ -95,7 +80,16 @@ fun HomeScreen(
 
     var isSelecting by rememberSaveable { mutableStateOf(false) }
 
+    var uninstallQueue by rememberSaveable(
+        stateSaver = listSaver<List<String>, String>(save = { it }, restore = { it })
+    ) { mutableStateOf(emptyList<String>()) }
+
+    var isUninstalling by rememberSaveable { mutableStateOf(false) }
+
+
     val setSaver = listSaver<Set<String>, String>(save = { it.toList() }, restore = { it.toSet() })
+
+
     var selectedApps by rememberSaveable(stateSaver = setSaver) { mutableStateOf(emptySet<String>()) }
 
 
@@ -108,6 +102,107 @@ fun HomeScreen(
             )
         }
     }
+
+    // --- Batch uninstall result tracking ---
+    var totalSelectedAtStart by rememberSaveable { mutableStateOf(0) }
+
+    val failedSaver = listSaver<List<String>, String>(save = { it }, restore = { it })
+    var failedPackages by rememberSaveable(stateSaver = failedSaver) { mutableStateOf(emptyList<String>()) }
+    var succeededCount by rememberSaveable { mutableStateOf(0) }
+
+    var showBatchResultDialog by rememberSaveable { mutableStateOf(false) }
+
+
+    val onAppUninstalled: (String) -> Unit = { packageName ->
+        mainViewModel.removeAppByPackageName(packageName)
+
+        if (uninstallQueue.isNotEmpty()) {
+
+            succeededCount += 1
+
+
+            // Remove the uninstalled app from the queue
+            uninstallQueue = uninstallQueue.drop(1)
+            // Trigger the next uninstall if the queue is not empty
+            if (uninstallQueue.isNotEmpty()) {
+                val nextPackage = uninstallQueue.first()
+                val uninstallIntent = Intent(Intent.ACTION_DELETE).apply {
+                    data = Uri.parse("package:$nextPackage")
+                }
+                context.startActivity(uninstallIntent)
+            } else {
+                // Uninstall process is complete
+                isUninstalling = false
+                isSelecting = false
+                selectedApps = emptySet()
+                showBatchResultDialog = true
+            }
+        }
+    }
+
+    val appUninstallReceiver = remember { AppUninstallReceiver(onAppUninstalled) }
+
+    DisposableEffect(context) {
+        val filter = IntentFilter(Intent.ACTION_PACKAGE_REMOVED)
+        filter.addDataScheme("package")
+        context.registerReceiver(appUninstallReceiver, filter)
+        onDispose {
+            context.unregisterReceiver(appUninstallReceiver)
+        }
+    }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME && isUninstalling && uninstallQueue.isNotEmpty()) {
+                // Check if the current app in the queue is still installed
+                val currentPackage = uninstallQueue.first()
+                val isAppStillInstalled = try {
+                    pm.getApplicationInfo(currentPackage, 0)
+                    true
+                } catch (e: PackageManager.NameNotFoundException) {
+                    false
+                }
+
+                if (isAppStillInstalled) {
+
+                    failedPackages = failedPackages + currentPackage
+
+
+                    // Remove the canceled app from the queue
+                    uninstallQueue = uninstallQueue.drop(1)
+                    // Proceed to the next app if the queue is not empty
+                    if (uninstallQueue.isNotEmpty()) {
+                        val nextPackage = uninstallQueue.first()
+                        val uninstallIntent = Intent(Intent.ACTION_DELETE).apply {
+                            data = Uri.parse("package:$nextPackage")
+                        }
+                        context.startActivity(uninstallIntent)
+                    } else {
+                        // Queue is empty, end the uninstall process
+                        isUninstalling = false
+                        isSelecting = false
+                        selectedApps = emptySet()
+                        showBatchResultDialog = true
+                    }
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+
+    if (!hasPackagePermission) {
+        LaunchedEffect(Unit) { mainViewModel.setError("Permission not granted to access app list.") }
+    } else {
+        LaunchedEffect(Unit) { mainViewModel.loadApps() }
+    }
+
+
+
 
     fun currentAllPackages(): Set<String> = filteredApps.map { it.packageName }.toSet()
 
@@ -228,8 +323,48 @@ fun HomeScreen(
             },
             onConfirmUninstall = {
                 showUninstallConfirm = false
-                // proceed to uninstall
-            }
+                if (selectedApps.isNotEmpty()) {
+                    // Filter out system apps and initialize the uninstall queue
+                    uninstallQueue = selectedApps.filter { packageName ->
+                        try {
+                            val appInfo = pm.getApplicationInfo(packageName, 0)
+                            (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0
+                        } catch (e: PackageManager.NameNotFoundException) {
+                            false
+                        }
+                    }
+
+                    totalSelectedAtStart = uninstallQueue.size
+                    failedPackages = emptyList()
+                    succeededCount = 0
+                    showBatchResultDialog = false
+
+
+
+                    if (uninstallQueue.isNotEmpty()) {
+                        isUninstalling = true
+                        val firstPackage = uninstallQueue.first()
+                        val uninstallIntent = Intent(Intent.ACTION_DELETE).apply {
+                            data = Uri.parse("package:$firstPackage")
+                        }
+                        context.startActivity(uninstallIntent)
+                    } else {
+                        mainViewModel.setError("Selected apps are system apps and cannot be uninstalled.")
+                        isSelecting = false
+                        selectedApps = emptySet()
+                    }
+                }
+            },
+            showBatchResultDialog = showBatchResultDialog,
+            totalSelectedAtStart = totalSelectedAtStart,
+            succeededCount = succeededCount,
+            failedPackages = failedPackages,
+            onDismissUninstallResultDialog = {
+                showBatchResultDialog = false
+                failedPackages = emptyList()
+                totalSelectedAtStart = 0
+                succeededCount = 0
+            },
         )
 
     }
