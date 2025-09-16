@@ -6,7 +6,6 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 
-// --- Sorting core (put in a separate file if you want) ---
 enum class SortKey { NAME, SIZE, INSTALLED, UPDATED }
 enum class SortOrder { ASC, DESC }
 
@@ -20,13 +19,13 @@ fun PackageInfo.appLabel(pm: PackageManager): String = applicationInfo?.loadLabe
 fun PackageInfo.apkSizeBytes(): Long = applicationInfo?.sourceDir?.let { java.io.File(it).length() } ?: 0L
 
 @Suppress("DEPRECATION")
-fun PackageInfo.lastUpdate(): Long = lastUpdateTime // already Long millis
+fun PackageInfo.lastUpdate(): Long = lastUpdateTime
 
 fun compareMaybeDesc(result: Int, order: SortOrder): Int = if (order == SortOrder.DESC) -result else result
 
 fun sortApps(
-    apps: List<android.content.pm.PackageInfo>, pm: PackageManager, config: SortConfig
-): List<android.content.pm.PackageInfo> {
+    apps: List<PackageInfo>, pm: PackageManager, config: SortConfig
+): List<PackageInfo> {
     if (apps.isEmpty()) return apps
     return apps.sortedWith { a, b ->
         val r = when (config.key) {

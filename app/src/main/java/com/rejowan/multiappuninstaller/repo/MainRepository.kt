@@ -7,5 +7,9 @@ interface MainRepository {
 
     suspend fun getAppList(): List<PackageInfo>
 
+    suspend fun isFirstLaunch(): Boolean
+
+    suspend fun setFirstLaunchDone()
+
 
 }

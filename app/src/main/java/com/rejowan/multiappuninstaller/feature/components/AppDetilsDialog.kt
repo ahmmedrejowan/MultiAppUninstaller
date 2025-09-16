@@ -35,155 +35,161 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import com.rejowan.multiappuninstaller.utils.DateFormatUtils
-import java.io.File
+import com.rejowan.multiappuninstaller.utils.ExtractUtils
 
 @Composable
 fun AppDetailsDialog(
-    packageInfo: PackageInfo,
-    onDismiss: () -> Unit
+    packageInfo: PackageInfo, onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
 
-    val appIcon = packageInfo.applicationInfo?.loadIcon(context.packageManager)
-    val appName = packageInfo.applicationInfo?.loadLabel(context.packageManager)?.toString() ?: "App Name"
+    val appIcon = ExtractUtils.getAppIcon(packageInfo, context)
 
-    val sizeStr = packageInfo.applicationInfo?.sourceDir?.let { src ->
-        val mb = File(src).length() / (1024f * 1024f)
-        String.format("%.2f MB", mb)
-    } ?: "Unknown size"
+    val appName = ExtractUtils.getAppName(packageInfo, context)
+
+    val sizeStr = ExtractUtils.getAppSize(packageInfo)
 
     val installDate = DateFormatUtils.millisToDateTime(packageInfo.firstInstallTime)
+
     val updateDate = DateFormatUtils.millisToDateTime(packageInfo.lastUpdateTime)
+
     val packageName = packageInfo.packageName
+
     val versionName = packageInfo.versionName ?: "Unknown"
+
     val versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
         packageInfo.longVersionCode.toString()
     } else {
         @Suppress("DEPRECATION") packageInfo.versionCode.toString()
     }
-    val minSdk = packageInfo.applicationInfo?.minSdkVersion?.toString() ?: "Unknown"
-    val targetSdk = packageInfo.applicationInfo?.targetSdkVersion?.toString() ?: "Unknown"
-    val installer = runCatching {
-        context.packageManager.getInstallerPackageName(packageName)
-    }.getOrNull() ?: "Unknown"
 
-    AlertDialog(onDismissRequest = onDismiss, confirmButton = {
-        TextButton(onClick = onDismiss) { Text("Dismiss") }
-    }, dismissButton = {
-        TextButton(
-            onClick = {
-                val intent = android.content.Intent(android.content.Intent.ACTION_DELETE).apply {
-                    data = "package:$packageName".toUri()
-                    addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
-                }
-                context.startActivity(intent)
-                onDismiss()
-            }) {
-            Text("Uninstall", color = MaterialTheme.colorScheme.error)
-        }
-    }, text = {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Centered icon
-            appIcon?.let {
+
+    val minSdk = packageInfo.applicationInfo?.minSdkVersion?.toString() ?: "Unknown"
+
+    val targetSdk = packageInfo.applicationInfo?.targetSdkVersion?.toString() ?: "Unknown"
+
+    val installer = ExtractUtils.getAppInstaller(packageInfo, context)
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Dismiss")
+            }
+        },
+
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    val intent = android.content.Intent(android.content.Intent.ACTION_DELETE).apply {
+                        data = "package:$packageName".toUri()
+                        addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    context.startActivity(intent)
+                    onDismiss()
+                }) {
+                Text("Uninstall", color = MaterialTheme.colorScheme.error)
+            }
+        }, text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Image(
-                    painter = BitmapPainter(it.toBitmap().asImageBitmap()),
+                    painter = BitmapPainter(appIcon.toBitmap().asImageBitmap()),
                     contentDescription = appName,
                     modifier = Modifier
                         .size(64.dp)
                         .padding(top = 4.dp, bottom = 8.dp)
                 )
-            }
 
-            // Centered app name
-            Text(
-                text = appName,
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 12.dp)
-            )
+                Text(
+                    text = appName,
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp)
+                )
 
-            // Left-aligned details
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 4.dp)
-            ) {
-                InfoBlock(label = "Package Name", value = packageName)
-                InfoBlock(label = "Version Info", value = "$versionName ($versionCode)")
-                InfoBlock(label = "App Size", value = sizeStr)
-                InfoBlock(label = "First Installed", value = installDate)
-                InfoBlock(label = "Last Updated", value = updateDate)
-                InfoBlock(label = "Min SDK", value = minSdk)
-                InfoBlock(label = "Target SDK", value = targetSdk)
-                InfoBlock(label = "Installer Package", value = installer)
-            }
-
-            Spacer(Modifier.height(8.dp))
-
-
-            Row {
-
-                OutlinedCard(
-                    modifier = Modifier.wrapContentHeight(), shape = RoundedCornerShape(50), onClick = {
-                        val intent = android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = android.net.Uri.fromParts("package", packageName, null)
-                            addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
-                        }
-                        context.startActivity(intent)
-                        onDismiss()
-
-                    }) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Info, contentDescription = "Open", modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Info", style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp)
+                ) {
+                    InfoBlock(label = "Package Name", value = packageName)
+                    InfoBlock(label = "Version Info", value = "$versionName ($versionCode)")
+                    InfoBlock(label = "App Size", value = sizeStr)
+                    InfoBlock(label = "First Installed", value = installDate)
+                    InfoBlock(label = "Last Updated", value = updateDate)
+                    InfoBlock(label = "Min SDK", value = minSdk)
+                    InfoBlock(label = "Target SDK", value = targetSdk)
+                    InfoBlock(label = "Installer Package", value = installer)
                 }
 
-                Spacer(Modifier.size(8.dp))
+                Spacer(Modifier.height(8.dp))
 
 
-                OutlinedCard(
-                    modifier = Modifier.wrapContentHeight(), shape = RoundedCornerShape(50), onClick = {
-                        context.packageManager.getLaunchIntentForPackage(packageName)?.let { intent ->
+                Row {
+
+                    OutlinedCard(
+                        modifier = Modifier.wrapContentHeight(), shape = RoundedCornerShape(50), onClick = {
+                            val intent =
+                                android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                    data = android.net.Uri.fromParts("package", packageName, null)
+                                    addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                                }
                             context.startActivity(intent)
+                            onDismiss()
+
+                        }) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Info, contentDescription = "Open", modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Info", style = MaterialTheme.typography.bodyMedium
+                            )
                         }
-                        onDismiss()
-                    }) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.OpenInNew,
-                            contentDescription = "Open",
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Open", style = MaterialTheme.typography.bodyMedium
-                        )
                     }
+
+                    Spacer(Modifier.size(8.dp))
+
+
+                    OutlinedCard(
+                        modifier = Modifier.wrapContentHeight(), shape = RoundedCornerShape(50), onClick = {
+                            context.packageManager.getLaunchIntentForPackage(packageName)?.let { intent ->
+                                context.startActivity(intent)
+                            }
+                            onDismiss()
+                        }) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+                                contentDescription = "Open",
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Open", style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+
                 }
 
             }
-
-        }
-    })
+        })
 }
 
 @Composable
