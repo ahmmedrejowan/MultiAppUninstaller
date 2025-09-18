@@ -3,7 +3,6 @@
 package com.rejowan.multiappuninstaller.feature.module.setting
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,10 +17,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Gavel
-import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.InvertColors
 import androidx.compose.material.icons.outlined.MailOutline
@@ -29,7 +28,6 @@ import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.StarOutline
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,7 +38,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -59,7 +56,9 @@ import com.rejowan.multiappuninstaller.feature.components.CreatorDialog
 import com.rejowan.multiappuninstaller.feature.components.CreditsDialog
 import com.rejowan.multiappuninstaller.feature.components.HowToUseDialog
 import com.rejowan.multiappuninstaller.feature.components.LicenseDialog
+import com.rejowan.multiappuninstaller.feature.components.PrivacyDialog
 import com.rejowan.multiappuninstaller.feature.components.VersionLogDialog
+import com.rejowan.multiappuninstaller.ui.theme.MiscUtils
 import com.rejowan.multiappuninstaller.vm.MainViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -77,6 +76,7 @@ fun SettingsScreen(
     var showLicenseDialog by remember { mutableStateOf(false) }
     var showVersionDialog by remember { mutableStateOf(false) }
     var showCreatorDialog by remember { mutableStateOf(false) }
+    var showPrivacyDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         mainViewModel.loadTheme()
@@ -95,7 +95,7 @@ fun SettingsScreen(
             }, navigationIcon = {
                 IconButton(onClick = onBackClick) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack, contentDescription = "Back"
+                        imageVector = Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Back"
                     )
                 }
             })
@@ -150,9 +150,7 @@ fun SettingsScreen(
                 text = "About", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(vertical = 8.dp)
             )
             SettingsItem(
-                icon = Icons.Outlined.Person, title = "Created By",
-                subtitle = "K M Rejowan Ahmmed (@ahmmedrejowan)",
-                onClick = {
+                icon = Icons.Outlined.Person, title = "Created By", subtitle = "K M Rejowan Ahmmed (@ahmmedrejowan)", onClick = {
                     showCreatorDialog = true
                 })
             SettingsItem(
@@ -160,7 +158,7 @@ fun SettingsScreen(
                     showVersionDialog = true
                 })
             SettingsItem(
-                icon = Icons.Outlined.HelpOutline,
+                icon = Icons.AutoMirrored.Outlined.HelpOutline,
                 title = "How to Use",
                 subtitle = "Quick guide on using the app",
                 onClick = { showHowToUseDialog = true })
@@ -181,17 +179,11 @@ fun SettingsScreen(
                 onClick = { showLicenseDialog = true })
             SettingsItem(
                 icon = Icons.Outlined.Security, title = "Privacy Policy", subtitle = "Read our privacy practices", onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW, "https://yourapp.com/privacy".toUri())
-                    context.startActivity(intent)
+                    showPrivacyDialog = true
                 })
             SettingsItem(
                 icon = Icons.Outlined.MailOutline, title = "Feedback", subtitle = "Send suggestions or report issues", onClick = {
-                    val intent = Intent(Intent.ACTION_SENDTO).apply {
-                        data = "mailto:kmrejowan@gmail.com".toUri()
-                        putExtra(Intent.EXTRA_SUBJECT, "Feedback for Multi App Uninstaller")
-
-                    }
-                    context.startActivity(intent)
+                    MiscUtils().mailIntent(context)
                 })
 
             OutlinedButton(
@@ -237,28 +229,34 @@ fun SettingsScreen(
         })
     }
 
-    if (showVersionDialog){
+    if (showVersionDialog) {
         VersionLogDialog {
             showVersionDialog = false
         }
     }
 
-    if (showCreatorDialog){
+    if (showCreatorDialog) {
         CreatorDialog(onDismiss = {
             showCreatorDialog = false
         })
     }
 
-    if (showCreditsDialog){
-        CreditsDialog (onDismiss = {
+    if (showCreditsDialog) {
+        CreditsDialog(onDismiss = {
             showCreditsDialog = false
         })
     }
 
 
     if (showLicenseDialog) {
-        LicenseDialog{
+        LicenseDialog {
             showLicenseDialog = false
+        }
+    }
+
+    if (showPrivacyDialog) {
+        PrivacyDialog {
+            showPrivacyDialog = false
         }
     }
 }
