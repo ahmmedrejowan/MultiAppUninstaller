@@ -56,7 +56,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import com.rejowan.multiappuninstaller.feature.components.CreatorDialog
+import com.rejowan.multiappuninstaller.feature.components.CreditsDialog
 import com.rejowan.multiappuninstaller.feature.components.HowToUseDialog
+import com.rejowan.multiappuninstaller.feature.components.LicenseDialog
 import com.rejowan.multiappuninstaller.feature.components.VersionLogDialog
 import com.rejowan.multiappuninstaller.vm.MainViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -247,43 +249,17 @@ fun SettingsScreen(
         })
     }
 
-    if (showCreditsDialog) {
-        AlertDialog(onDismissRequest = { showCreditsDialog = false }, confirmButton = {
-            TextButton(onClick = { showCreditsDialog = false }) {
-                Text("Close")
-            }
-        }, title = { Text("Credits") }, text = {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                Text(
-                    text = """
-                            - Icons: Material Design Icons
-                            - Libraries: Jetpack Compose, Kotlin Coroutines
-                            - Contributors: Jane Smith (@janesmith_dev)
-                        """.trimIndent(), style = MaterialTheme.typography.bodyMedium
-                )
-            }
+    if (showCreditsDialog){
+        CreditsDialog (onDismiss = {
+            showCreditsDialog = false
         })
     }
 
-    // License Dialog
+
     if (showLicenseDialog) {
-        AlertDialog(onDismissRequest = { showLicenseDialog = false }, confirmButton = {
-            TextButton(onClick = { showLicenseDialog = false }) {
-                Text("Close")
-            }
-        }, title = { Text("License") }, text = {
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                Text(
-                    text = """
-                            MIT License
-                            Copyright (c) 2025 John Doe
-                            
-                            Permission is hereby granted, free of charge, to any person obtaining a copy...
-                            [Full MIT License text abbreviated for brevity]
-                        """.trimIndent(), style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        })
+        LicenseDialog{
+            showLicenseDialog = false
+        }
     }
 }
 
