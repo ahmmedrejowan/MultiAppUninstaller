@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun CancelConfirmationDialog(
-    totalSelectedApps : Int,
+    totalSelectedApps: Int,
     onCancel: () -> Unit,
     onExit: () -> Unit
 ) {

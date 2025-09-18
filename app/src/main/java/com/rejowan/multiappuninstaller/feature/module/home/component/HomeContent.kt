@@ -66,7 +66,7 @@ fun HomeContent(
     onDismissUninstallResultDialog: () -> Unit,
     showFirstTutorial: Boolean,
     onDismissFirstTutorial: () -> Unit
-    ) {
+) {
 
 
     var detailsFor by remember { mutableStateOf<PackageInfo?>(null) }
@@ -159,11 +159,11 @@ fun HomeContent(
             )
         }
 
-        if (showFirstTutorial){
-            Log.e("HomeContent","Showing first tutorial dialog")
-             HowToUseDialog(onDismiss = {
+        if (showFirstTutorial) {
+            Log.e("HomeContent", "Showing first tutorial dialog")
+            HowToUseDialog(onDismiss = {
                 onDismissFirstTutorial()
-             })
+            })
         }
 
 
@@ -171,7 +171,7 @@ fun HomeContent(
             AppDetailsDialog(
                 packageInfo = pkg,
                 onDismiss = { detailsFor = null }
-                )
+            )
         }
 
 

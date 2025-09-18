@@ -46,7 +46,9 @@ fun ConfirmUninstallDialog(
         Column(Modifier.fillMaxWidth()) {
 
             Text(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
                 text = "Uninstall $count Apps",
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,

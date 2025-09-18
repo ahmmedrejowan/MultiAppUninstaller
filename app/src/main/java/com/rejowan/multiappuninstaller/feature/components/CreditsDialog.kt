@@ -111,11 +111,6 @@ fun CreditsDialog(onDismiss: () -> Unit) {
                 })
 
 
-
-
-
-
-
         }
     }, confirmButton = {
         TextButton(

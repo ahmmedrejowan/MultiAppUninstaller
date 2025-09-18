@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -17,7 +16,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -28,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -62,7 +59,10 @@ fun CreatorDialog(onDismiss: () -> Unit) {
                     text = "K M Rejowan Ahmmed", style = MaterialTheme.typography.titleMedium, fontSize = 18.sp
                 )
                 Text(
-                    text = "@ahmmedrejowan", style = MaterialTheme.typography.titleSmall, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = "@ahmmedrejowan",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -110,8 +110,10 @@ fun CreatorDialog(onDismiss: () -> Unit) {
                 title = "LinkedIn",
                 subtitle = "@ahmmedrejowan",
                 onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW, "https://linkedin.com/in/ahmmedrejowan"
-                        .toUri())
+                    val intent = Intent(
+                        Intent.ACTION_VIEW, "https://linkedin.com/in/ahmmedrejowan"
+                            .toUri()
+                    )
                     context.startActivity(intent)
                 }
             )
@@ -121,13 +123,12 @@ fun CreatorDialog(onDismiss: () -> Unit) {
                 title = "YouTube",
                 subtitle = "Tranquilly Coding",
                 onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW, "https://youtube.com/@TranquillyCoding".
-                    toUri())
+                    val intent = Intent(
+                        Intent.ACTION_VIEW, "https://youtube.com/@TranquillyCoding".toUri()
+                    )
                     context.startActivity(intent)
                 }
             )
-
-
 
 
         }
@@ -155,10 +156,11 @@ private fun SingleCreatorInfo(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 6.dp).padding(start = 12.dp), verticalAlignment = Alignment.CenterVertically
+                .padding(vertical = 6.dp)
+                .padding(start = 12.dp), verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                painter = androidx.compose.ui.res.painterResource(id = icon),
+                painter = painterResource(id = icon),
                 contentDescription = title,
                 modifier = Modifier.size(24.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant

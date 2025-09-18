@@ -61,12 +61,13 @@ fun LicenseDialog(onDismiss: () -> Unit) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Row(modifier = Modifier
-                .clickable {
-                    val intent = Intent(Intent.ACTION_VIEW, "https://www.apache.org/licenses/LICENSE-2.0".toUri())
-                    context.startActivity(intent)
-                }
-                .padding(8.dp)) {
+            Row(
+                modifier = Modifier
+                    .clickable {
+                        val intent = Intent(Intent.ACTION_VIEW, "https://www.apache.org/licenses/LICENSE-2.0".toUri())
+                        context.startActivity(intent)
+                    }
+                    .padding(8.dp)) {
                 Icon(
                     imageVector = Icons.Default.Link,
                     contentDescription = "Link Icon",

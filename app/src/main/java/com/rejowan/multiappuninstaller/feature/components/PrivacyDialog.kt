@@ -48,7 +48,7 @@ fun PrivacyDialog(onDismiss: () -> Unit) {
                 text = "Information Collection and Use",
                 style = MaterialTheme.typography.titleMedium,
 
-            )
+                )
             Spacer(Modifier.size(4.dp))
             Text(
                 text = "The Application does not collect, store, or process any personal information from users. It only accesses the list of installed apps on your device to provide the uninstall feature.",
@@ -61,7 +61,7 @@ fun PrivacyDialog(onDismiss: () -> Unit) {
                 text = "Location Information",
                 style = MaterialTheme.typography.titleMedium,
 
-            )
+                )
             Spacer(Modifier.size(4.dp))
             Text(
                 text = "The Application does not collect any location information from your device.",
@@ -74,7 +74,7 @@ fun PrivacyDialog(onDismiss: () -> Unit) {
                 text = "Third-Party Access",
                 style = MaterialTheme.typography.titleMedium,
 
-            )
+                )
             Spacer(Modifier.size(4.dp))
             Text(
                 text = "Since the Application does not collect any data, no information is shared with third parties.",
@@ -87,7 +87,7 @@ fun PrivacyDialog(onDismiss: () -> Unit) {
                 text = "Opt-Out Rights",
                 style = MaterialTheme.typography.titleMedium,
 
-            )
+                )
             Spacer(Modifier.size(4.dp))
             Text(
                 text = "You can stop using the Application by uninstalling it using your device's standard uninstall process or through the mobile application marketplace.",
@@ -100,7 +100,7 @@ fun PrivacyDialog(onDismiss: () -> Unit) {
                 text = "Children",
                 style = MaterialTheme.typography.titleMedium,
 
-            )
+                )
             Spacer(Modifier.size(4.dp))
             Text(
                 text = "The Application does not target or knowingly collect information from children under 13. Parents and guardians are encouraged to monitor their children's use of the Application.",
@@ -113,7 +113,7 @@ fun PrivacyDialog(onDismiss: () -> Unit) {
                 text = "Security",
                 style = MaterialTheme.typography.titleMedium,
 
-            )
+                )
             Spacer(Modifier.size(4.dp))
             Text(
                 text = "As the Application does not collect or store any data, there is no risk of unauthorized access to user information.",
@@ -126,7 +126,7 @@ fun PrivacyDialog(onDismiss: () -> Unit) {
                 text = "Changes to This Policy",
                 style = MaterialTheme.typography.titleMedium,
 
-            )
+                )
             Spacer(Modifier.size(4.dp))
             Text(
                 text = "This Privacy Policy may be updated periodically. Changes will be posted on this page, and continued use of the Application constitutes acceptance of any updates.",
@@ -139,7 +139,7 @@ fun PrivacyDialog(onDismiss: () -> Unit) {
                 text = "Contact Us",
                 style = MaterialTheme.typography.titleMedium,
 
-            )
+                )
             Spacer(Modifier.size(4.dp))
             Text(
                 text = "For questions about this Privacy Policy, contact the Service Provider at kmrejowan@gmail.com.",
@@ -152,7 +152,7 @@ fun PrivacyDialog(onDismiss: () -> Unit) {
                 text = "Effective Date",
                 style = MaterialTheme.typography.titleMedium,
 
-            )
+                )
             Spacer(Modifier.size(4.dp))
             Text(
                 text = "This policy is effective as of September 18, 2025.",

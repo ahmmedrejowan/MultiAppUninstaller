@@ -10,7 +10,7 @@ import timber.log.Timber
 class MiscUtils {
 
 
-    fun mailIntent(context: Context){
+    fun mailIntent(context: Context) {
         val packageInfo = try {
             context.packageManager.getPackageInfo(context.packageName, 0)
         } catch (e: Exception) {
