@@ -114,10 +114,12 @@ fun HomeScreen(
     ) { mutableStateOf(emptyList<String>()) }
 
     val onAppUninstalled: (String) -> Unit = { packageName ->
-        mainViewModel.removeAppByPackageName(packageName)
+
+
         if (uninstallQueue.isNotEmpty()) {
             succeededCount += 1
             uninstallQueue = uninstallQueue.drop(1)
+            mainViewModel.removeAppByPackageName(packageName)
             if (uninstallQueue.isNotEmpty()) {
                 val nextPackage = uninstallQueue.first()
                 val uninstallIntent = Intent(Intent.ACTION_DELETE).apply {
@@ -130,6 +132,8 @@ fun HomeScreen(
                 selectedApps = emptySet()
                 showBatchResultDialog = true
             }
+        } else {
+            mainViewModel.removeAppByPackageName(packageName)
         }
     }
 
