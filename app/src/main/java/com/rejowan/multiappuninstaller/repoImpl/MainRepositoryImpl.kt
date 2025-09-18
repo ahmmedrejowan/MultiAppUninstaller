@@ -4,12 +4,16 @@ import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
-import com.rejowan.multiappuninstaller.data.DataStoreHelper
+import android.util.Printer
+import com.rejowan.multiappuninstaller.data.FirstLaunchHelper
+import com.rejowan.multiappuninstaller.data.ThemePrefHelper
 import com.rejowan.multiappuninstaller.repo.MainRepository
+import kotlinx.coroutines.flow.Flow
 
 class MainRepositoryImpl(
     private val context: Context,
-    private val dataStoreHelper: DataStoreHelper
+    private val firstLaunchHelper: FirstLaunchHelper,
+    private val themePrefHelper: ThemePrefHelper
 ) : MainRepository {
 
 
@@ -34,11 +38,33 @@ class MainRepositoryImpl(
     }
 
     override suspend fun isFirstLaunch(): Boolean {
-        return dataStoreHelper.isFirstLaunch()
+        return firstLaunchHelper.isFirstLaunch()
     }
 
     override suspend fun setFirstLaunchDone() {
-        dataStoreHelper.setFirstLaunchDone()
+        firstLaunchHelper.setFirstLaunchDone()
     }
+
+
+    override suspend fun saveTheme(theme: String) {
+        themePrefHelper.saveTheme(theme)
+    }
+
+    override fun getTheme(): Flow<String> {
+        return themePrefHelper.getTheme()
+    }
+
+    override suspend fun setDefaultThemeIfNotSet() {
+        themePrefHelper.setDefaultThemeIfNotSet()
+    }
+
+    override suspend fun saveDynamicColorPreference(enabled: Boolean) {
+        themePrefHelper.saveDynamicColorPreference(enabled)
+    }
+
+    override fun isDynamicColorEnabled(): Flow<Boolean> {
+        return themePrefHelper.isDynamicColorEnabled()
+    }
+
 
 }

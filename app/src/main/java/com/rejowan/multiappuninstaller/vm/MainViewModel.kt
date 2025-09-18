@@ -25,6 +25,12 @@ class MainViewModel(
     private val _isFirstLaunch = MutableStateFlow<Boolean?>(null)
     val isFirstLaunch: StateFlow<Boolean?> = _isFirstLaunch
 
+    private val _theme = MutableStateFlow("System Default")
+    val theme: StateFlow<String> = _theme
+
+    private val _dynamicColorEnabled = MutableStateFlow(false)
+    val dynamicColorEnabled: StateFlow<Boolean> = _dynamicColorEnabled
+
     fun loadApps() {
         viewModelScope.launch {
             _loading.value = true
@@ -64,6 +70,50 @@ class MainViewModel(
         viewModelScope.launch {
             _isFirstLaunch.value = false
             mainRepository.setFirstLaunchDone()
+        }
+    }
+
+    fun loadTheme() {
+        viewModelScope.launch {
+            mainRepository.getTheme().collect { theme ->
+                _theme.value = theme
+                Timber.tag("MainViewModel").e("Theme loaded: $theme")
+            }
+        }
+    }
+
+    fun saveTheme(theme: String) {
+        viewModelScope.launch {
+            mainRepository.saveTheme(theme)
+            _theme.value = theme
+            Timber.tag("MainViewModel").e("Theme saved: $theme")
+        }
+    }
+
+    fun setDefaultThemeIfNotSet() {
+        viewModelScope.launch {
+            mainRepository.setDefaultThemeIfNotSet()
+            mainRepository.getTheme().collect { theme ->
+                _theme.value = theme
+                Timber.tag("MainViewModel").e("Default theme set: $theme")
+            }
+        }
+    }
+
+    fun loadDynamicColorPreference() {
+        viewModelScope.launch {
+            mainRepository.isDynamicColorEnabled().collect { enabled ->
+                _dynamicColorEnabled.value = enabled
+                Timber.tag("MainViewModel").e("Dynamic color preference loaded: $enabled")
+            }
+        }
+    }
+
+    fun saveDynamicColorPreference(enabled: Boolean) {
+        viewModelScope.launch {
+            mainRepository.saveDynamicColorPreference(enabled)
+            _dynamicColorEnabled.value = enabled
+            Timber.tag("MainViewModel").e("Dynamic color preference saved: $enabled")
         }
     }
 

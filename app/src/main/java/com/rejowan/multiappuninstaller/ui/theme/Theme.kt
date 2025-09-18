@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.rejowan.multiappuninstaller.ui.theme
 
 import android.os.Build
@@ -8,9 +10,12 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import androidx.compose.ui.graphics.Color
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.rejowan.multiappuninstaller.data.ThemePrefHelper
+import org.koin.compose.koinInject
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -88,24 +93,22 @@ private val darkScheme = darkColorScheme(
     surfaceContainerHighest = surfaceContainerHighestDark,
 )
 
-@Immutable
-data class ColorFamily(
-    val color: Color,
-    val onColor: Color,
-    val colorContainer: Color,
-    val onColorContainer: Color
-)
-
-val unspecified_scheme = ColorFamily(
-    Color.Unspecified, Color.Unspecified, Color.Unspecified, Color.Unspecified
-)
 
 @Composable
 fun MAUTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false,
+    themePrefHelper: ThemePrefHelper = koinInject(),
     content: @Composable() () -> Unit
 ) {
+
+    val theme by themePrefHelper.getTheme().collectAsState(initial = "System")
+    val dynamicColor by themePrefHelper.isDynamicColorEnabled().collectAsState(initial = false)
+
+    val darkTheme = when (theme) {
+        "Light" -> false
+        "Dark" -> true
+        else -> isSystemInDarkTheme()
+    }
+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
@@ -116,10 +119,16 @@ fun MAUTheme(
         else -> lightScheme
     }
 
+    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = !darkTheme
+
+    systemUiController.setStatusBarColor(
+        color = colorScheme.surface,
+        darkIcons = useDarkIcons
+    )
+
     MaterialTheme(
-        colorScheme = colorScheme,
-        typography = AppTypography,
-        content = content
+        colorScheme = colorScheme, typography = AppTypography, content = content
     )
 }
 

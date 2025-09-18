@@ -92,4 +92,6 @@ dependencies {
     // timber
     implementation(libs.timber)
 
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.36.0")
+
 }

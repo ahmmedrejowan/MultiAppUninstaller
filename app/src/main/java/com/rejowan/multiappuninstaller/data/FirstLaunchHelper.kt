@@ -11,7 +11,7 @@ import androidx.datastore.preferences.preferencesDataStore
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "app_preferences")
 
-class DataStoreHelper(private val context: Context) {
+class FirstLaunchHelper(private val context: Context) {
 
     private val preferencesKey = booleanPreferencesKey("is_first_launch")
 
