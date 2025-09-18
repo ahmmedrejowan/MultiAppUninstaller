@@ -55,7 +55,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import com.rejowan.multiappuninstaller.feature.components.CreatorDialog
 import com.rejowan.multiappuninstaller.feature.components.HowToUseDialog
+import com.rejowan.multiappuninstaller.feature.components.VersionLogDialog
 import com.rejowan.multiappuninstaller.vm.MainViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -71,6 +73,8 @@ fun SettingsScreen(
     var showHowToUseDialog by remember { mutableStateOf(false) }
     var showCreditsDialog by remember { mutableStateOf(false) }
     var showLicenseDialog by remember { mutableStateOf(false) }
+    var showVersionDialog by remember { mutableStateOf(false) }
+    var showCreatorDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         mainViewModel.loadTheme()
@@ -144,12 +148,15 @@ fun SettingsScreen(
                 text = "About", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(vertical = 8.dp)
             )
             SettingsItem(
-                icon = Icons.Outlined.Person, title = "Created By", subtitle = "K M Rejowan Ahmmed (@ahmmedrejowan)", onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW, "https://github.com/ahmmedrejowan".toUri())
-                    context.startActivity(intent)
+                icon = Icons.Outlined.Person, title = "Created By",
+                subtitle = "K M Rejowan Ahmmed (@ahmmedrejowan)",
+                onClick = {
+                    showCreatorDialog = true
                 })
             SettingsItem(
-                icon = Icons.Outlined.Info, title = "Version", subtitle = "0.1.0 (Build 1)", onClick = {})
+                icon = Icons.Outlined.Info, title = "Version", subtitle = "0.1.0 (Build 1)", onClick = {
+                    showVersionDialog = true
+                })
             SettingsItem(
                 icon = Icons.Outlined.HelpOutline,
                 title = "How to Use",
@@ -225,6 +232,18 @@ fun SettingsScreen(
     if (showHowToUseDialog) {
         HowToUseDialog(onDismiss = {
             showHowToUseDialog = false
+        })
+    }
+
+    if (showVersionDialog){
+        VersionLogDialog {
+            showVersionDialog = false
+        }
+    }
+
+    if (showCreatorDialog){
+        CreatorDialog(onDismiss = {
+            showCreatorDialog = false
         })
     }
 
