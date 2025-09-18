@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.rejowan.multiappuninstaller.utils
 
 import android.content.Context

@@ -4,16 +4,13 @@ import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
-import android.util.Printer
 import com.rejowan.multiappuninstaller.data.FirstLaunchHelper
 import com.rejowan.multiappuninstaller.data.ThemePrefHelper
 import com.rejowan.multiappuninstaller.repo.MainRepository
 import kotlinx.coroutines.flow.Flow
 
 class MainRepositoryImpl(
-    private val context: Context,
-    private val firstLaunchHelper: FirstLaunchHelper,
-    private val themePrefHelper: ThemePrefHelper
+    private val context: Context, private val firstLaunchHelper: FirstLaunchHelper, private val themePrefHelper: ThemePrefHelper
 ) : MainRepository {
 
 

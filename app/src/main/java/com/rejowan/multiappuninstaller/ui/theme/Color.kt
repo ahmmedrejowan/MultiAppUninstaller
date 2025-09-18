@@ -73,31 +73,3 @@ val surfaceContainerLowDark = Color(0xFF171D19)
 val surfaceContainerDark = Color(0xFF1B211D)
 val surfaceContainerHighDark = Color(0xFF252B28)
 val surfaceContainerHighestDark = Color(0xFF303632)
-
-
-// neutral color shades
-object NeutralColors {
-    val neutral0 = Color(0xFFFFFFFF)   // White
-    val neutral50 = Color(0xFFF0F5EF)  // Very light gray
-    val neutral100 = Color(0xFFF5FBF5) // Light gray
-    val neutral200 = Color(0xFFEAEFE9) // Light gray, slightly darker
-    val neutral300 = Color(0xFFD6DBD6) // Medium-light gray
-    val neutral400 = Color(0xFFB2B8B2) // Medium gray
-    val neutral500 = Color(0xFF8E948E) // Medium-dark gray
-    val neutral600 = Color(0xFF6A706A) // Dark gray
-    val neutral700 = Color(0xFF464C46) // Very dark gray
-    val neutral800 = Color(0xFF222822) // Almost black, very dark gray
-    val neutral900 = Color(0xFF000000) // Black
-}
-
-// other general colors
-object GeneralColors {
-    val red = Color(0xFFFF0000)        // Bright red
-    val green = Color(0xFF00FF00)      // Bright green
-    val blue = Color(0xFF0000FF)       // Bright blue
-    val yellow = Color(0xFFFFFF00)     // Bright yellow
-    val orange = Color(0xFFFFA500)     // Bright orange
-    val purple = Color(0xFF800080)     // Bright purple
-    val pink = Color(0xFFFFC0CB)       // Light pink
-    val cyan = Color(0xFF00FFFF)       // Cyan
-}

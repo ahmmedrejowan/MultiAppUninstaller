@@ -1,9 +1,7 @@
 package com.rejowan.multiappuninstaller
 
 import android.app.Application
-import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
-import com.rejowan.multiappuninstaller.data.FirstLaunchHelper
 import com.rejowan.multiappuninstaller.data.ThemePrefHelper
 import com.rejowan.multiappuninstaller.di.mainModule
 import kotlinx.coroutines.CoroutineScope
@@ -37,6 +35,7 @@ class MAUApp : Application() {
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                         Timber.tag("MAUApp").e("Set mode: ${AppCompatDelegate.getDefaultNightMode()}")
                     }
+
                     "Dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                     else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
                 }

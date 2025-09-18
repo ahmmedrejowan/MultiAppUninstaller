@@ -80,19 +80,15 @@ dependencies {
     // accompanist
     implementation(libs.accompanist.insets)
     implementation(libs.accompanist.permissions)
+    implementation(libs.accompanist.systemuicontroller)
 
 
     // data store
     implementation(libs.androidx.datastore.preferences)
 
-    // coil
-    implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
 
     // timber
     implementation(libs.timber)
 
-    // accompanist - system ui controller
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.36.0")
 
 }

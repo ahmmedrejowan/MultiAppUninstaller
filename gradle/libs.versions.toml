@@ -1,4 +1,5 @@
 [versions]
+accompanistSystemuicontroller = "0.36.0"
 agp = "8.11.1"
 kotlin = "2.2.10"
 coreKtx = "1.17.0"
@@ -8,7 +9,6 @@ espressoCore = "3.7.0"
 lifecycleRuntimeKtx = "2.9.3"
 activityCompose = "1.10.1"
 composeBom = "2025.08.01"
-coilCompose = "3.3.0"
 uiTextGoogleFonts = "1.9.0"
 accompanistInsets = "0.30.1"
 accompanistPermissions = "0.37.3"
@@ -20,6 +20,7 @@ runtimeLivedata = "1.9.0"
 timber = "5.0.1"
 
 [libraries]
+accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -34,8 +35,6 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
-coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilCompose" }
 androidx-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 accompanist-insets = { module = "com.google.accompanist:accompanist-insets", version.ref = "accompanistInsets" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
