@@ -115,8 +115,9 @@ fun HomeScreen(
 
     val onAppUninstalled: (String) -> Unit = { packageName ->
 
-
-        if (uninstallQueue.isNotEmpty()) {
+        if (!isSelecting) {
+            mainViewModel.removeAppByPackageName(packageName)
+        } else {
             succeededCount += 1
             uninstallQueue = uninstallQueue.drop(1)
             mainViewModel.removeAppByPackageName(packageName)
@@ -130,10 +131,10 @@ fun HomeScreen(
                 isUninstalling = false
                 isSelecting = false
                 selectedApps = emptySet()
-                showBatchResultDialog = true
+                if (!showBatchResultDialog) {
+                    showBatchResultDialog = true
+                }
             }
-        } else {
-            mainViewModel.removeAppByPackageName(packageName)
         }
     }
 
@@ -155,8 +156,7 @@ fun HomeScreen(
                 val isAppStillInstalled = try {
                     pm.getApplicationInfo(currentPackage, 0)
                     true
-                } catch (e: PackageManager.NameNotFoundException) {
-                    Timber.tag("HomeScreen").e(e, "Package not found: $currentPackage")
+                } catch (_: PackageManager.NameNotFoundException) {
                     false
                 }
                 if (isAppStillInstalled) {
@@ -172,7 +172,9 @@ fun HomeScreen(
                         isUninstalling = false
                         isSelecting = false
                         selectedApps = emptySet()
-                        showBatchResultDialog = true
+                        if (!showBatchResultDialog) {
+                            showBatchResultDialog = true
+                        }
                     }
                 }
             }
