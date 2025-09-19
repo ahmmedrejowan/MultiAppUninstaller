@@ -36,16 +36,53 @@ uninstall multiple apps at once. That's how the idea of Multi App Uninstaller ca
 | ![Screenshot 6](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/3.jpg) | ![Screenshot 3](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/4.jpg) | ![Screenshot 4](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/5.jpg) |
 | ![Screenshot 8](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/6.jpg) | ![Screenshot 9](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/7.jpg) | ![Screenshot 7](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/8.jpg) |
 
-## Download
-You can download the latest APK from here
-
+## Download 
 ![GitHub Release](https://img.shields.io/github/v/release/ahmmedrejowan/MultiAppUninstaller)
 
+You can download the latest APK from here
 
 <a href="https://github.com/ahmmedrejowan/MultiAppUninstaller/releases/download/0.1.0/MAU.0.1.0.apk">
 <img src="https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/get.png" width="224px" align="center"/>
 </a>
 
-<br>
 
 Check out the [releases](https://github.com/ahmmedrejowan/MultiAppUninstaller/releases) section for more details.
+
+## ChangeLog
+
+- Initial Release [v0.1.0](https://github.com/ahmmedrejowan/MultiAppUninstaller/tags)
+  - App Info
+  - Single App Uninstall
+  - Multi App Uninstall
+
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+Please fork this repository and contribute back using [pull requests](https://github.com/ahmmedrejowan/MultiAppUninstaller/pulls).
+
+Any contributions, large or small, major features, bug fixes, are welcomed and appreciated.
+
+Let me know which features you want in the future in `Request Feature` tab.
+
+If this project helps you a little bit, then give a to Star ⭐ the Repo.
+
+## License
+
+[Apache Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html)
+
+```
+Copyright 2025 ahmmedrejowan
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+```
