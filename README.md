@@ -48,6 +48,17 @@ You can download the latest APK from here
 
 Check out the [releases](https://github.com/ahmmedrejowan/MultiAppUninstaller/releases) section for more details.
 
+## Build & Run
+To build and run the project, follow these steps:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/ahmmedrejowan/MultiAppUninstaller.git
+    ```
+2. Open the project in Android Studio.
+3. Sync the project with Gradle files.
+4. Connect your Android device or start an emulator.
+5. Click on the "Run" button in Android Studio to build and run the app.
+
 ## ChangeLog
 
 - Initial Release [v0.1.0](https://github.com/ahmmedrejowan/MultiAppUninstaller/tags)
