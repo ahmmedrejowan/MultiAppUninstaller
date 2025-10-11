@@ -1,4 +1,4 @@
-package com.rejowan.multiappuninstaller.ui.theme
+package com.rejowan.multiappuninstaller.utils
 
 import android.content.ActivityNotFoundException
 import android.content.Context

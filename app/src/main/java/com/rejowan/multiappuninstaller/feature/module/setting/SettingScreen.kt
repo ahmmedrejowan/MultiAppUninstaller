@@ -58,7 +58,7 @@ import com.rejowan.multiappuninstaller.feature.components.HowToUseDialog
 import com.rejowan.multiappuninstaller.feature.components.LicenseDialog
 import com.rejowan.multiappuninstaller.feature.components.PrivacyDialog
 import com.rejowan.multiappuninstaller.feature.components.VersionLogDialog
-import com.rejowan.multiappuninstaller.ui.theme.MiscUtils
+import com.rejowan.multiappuninstaller.utils.MiscUtils
 import com.rejowan.multiappuninstaller.vm.MainViewModel
 import org.koin.androidx.compose.koinViewModel
 
