@@ -119,13 +119,13 @@ fun MAUTheme(
         else -> lightScheme
     }
 
-    val systemUiController = rememberSystemUiController()
-    val useDarkIcons = !darkTheme
-
-    systemUiController.setStatusBarColor(
-        color = colorScheme.surface,
-        darkIcons = useDarkIcons
-    )
+//    val systemUiController = rememberSystemUiController()
+//    val useDarkIcons = !darkTheme
+//
+//    systemUiController.setStatusBarColor(
+//        color = colorScheme.surface,
+//        darkIcons = useDarkIcons
+//    )
 
     MaterialTheme(
         colorScheme = colorScheme, typography = AppTypography, content = content

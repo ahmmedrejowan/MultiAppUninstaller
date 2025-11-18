@@ -44,7 +44,11 @@ fun SelectionBottomBar(
     onCancel: () -> Unit,
     onUninstall: () -> Unit,
 ) {
-    AnimatedVisibility(visible = visible, enter = slideInVertically { it }, exit = slideOutVertically { it }) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = slideInVertically(initialOffsetY = { it }), // Slide in from bottom
+        exit = slideOutVertically(targetOffsetY = { it })  // Slide out to bottom
+    ) {
 
 
         Column(
