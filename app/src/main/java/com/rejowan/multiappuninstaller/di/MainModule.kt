@@ -17,7 +17,4 @@ val mainModule = module {
     // ViewModels
     viewModel { HomeViewModel(get()) }
     viewModel { com.rejowan.multiappuninstaller.presentation.settings.SettingsViewModel(get()) }
-
-    // Keep MainViewModel alias for backward compatibility (will be removed)
-    viewModel { com.rejowan.multiappuninstaller.vm.MainViewModel(get()) }
 }

@@ -46,7 +46,7 @@ import com.rejowan.multiappuninstaller.feature.components.ConfirmUninstallDialog
 import com.rejowan.multiappuninstaller.feature.components.ExitConfirmationDialog
 import com.rejowan.multiappuninstaller.feature.components.HowToUseDialog
 import com.rejowan.multiappuninstaller.feature.components.SelectionBottomBar
-import com.rejowan.multiappuninstaller.presentation.settings.NewSettingsScreen
+import com.rejowan.multiappuninstaller.presentation.settings.SettingsScreen
 import com.rejowan.multiappuninstaller.presentation.home.components.AppListItem
 import com.rejowan.multiappuninstaller.presentation.home.components.EmptySearchState
 import com.rejowan.multiappuninstaller.presentation.home.components.ErrorState
@@ -70,7 +70,7 @@ import timber.log.Timber
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewHomeScreen(
+fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
@@ -268,7 +268,7 @@ fun NewHomeScreen(
 
     // Main UI
     if (isSettingsVisible) {
-        NewSettingsScreen(onBackClick = { isSettingsVisible = false })
+        SettingsScreen(onBackClick = { isSettingsVisible = false })
     } else {
         Scaffold(
             topBar = {

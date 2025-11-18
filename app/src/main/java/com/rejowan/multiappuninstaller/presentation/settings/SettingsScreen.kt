@@ -38,7 +38,7 @@ import org.koin.androidx.compose.koinViewModel
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewSettingsScreen(
+fun SettingsScreen(
     onBackClick: () -> Unit,
     viewModel: SettingsViewModel = koinViewModel()
 ) {
