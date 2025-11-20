@@ -1,4 +1,4 @@
-<p align="center"><img src="https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/logo.png" width="264px" align="center"/></p>
+<p align="center"><img src="https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/logo.png" width="192px" align="center"/></p>
 <p align="center"> <a href="https://www.android.com"><img src="https://img.shields.io/badge/platform-Android-yellow.svg" alt="platform"></a>
  <a href="https://android-arsenal.com/api?level=26"><img src="https://img.shields.io/badge/API-24%2B-brightgreen.svg?style=flat" alt="API"></a> <a href="https://github.com/ahmmedrejowan/MultiAppUninstaller/blob/master/LICENSE"><img src="https://img.shields.io/github/license/ahmmedrejowan/MultiAppUninstaller" alt="GitHub license"></a> </p>
 
@@ -34,7 +34,6 @@ uninstall multiple apps at once. That's how the idea of Multi App Uninstaller ca
 |---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | ![Screenshot 1](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/0.jpg) | ![Screenshot 2](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/1.jpg) | ![Screenshot 5](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/2.jpg) |
 | ![Screenshot 6](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/3.jpg) | ![Screenshot 3](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/4.jpg) | ![Screenshot 4](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/5.jpg) |
-| ![Screenshot 8](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/6.jpg) | ![Screenshot 9](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/7.jpg) | ![Screenshot 7](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/8.jpg) |
 
 ## Download 
 ![GitHub Release](https://img.shields.io/github/v/release/ahmmedrejowan/MultiAppUninstaller)
