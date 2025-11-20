@@ -1,3 +1,21 @@
+/*
+ * Multi App Uninstaller
+ * Copyright (C) 2025 K M Rejowan Ahmmed
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.rejowan.multiappuninstaller.presentation.home
 
 import android.Manifest
@@ -111,10 +129,14 @@ fun HomeScreen(
     var uninstallQueue by rememberSaveable(stateSaver = listSaver(save = { it }, restore = { it })) {
         mutableStateOf(emptyList<String>())
     }
-    var totalSelectedAtStart by rememberSaveable { mutableIntStateOf(0) }
+    val originalQueueSaver = listSaver<List<String>, String>(save = { it }, restore = { it })
+    var originalQueueSnapshot by rememberSaveable(stateSaver = originalQueueSaver) { mutableStateOf(emptyList<String>()) }
+    val succeededPackagesSaver = listSaver<List<String>, String>(save = { it }, restore = { it })
+    var succeededPackages by rememberSaveable(stateSaver = succeededPackagesSaver) { mutableStateOf(emptyList<String>()) }
     var succeededCount by rememberSaveable { mutableIntStateOf(0) }
     val failedSaver = listSaver<List<String>, String>(save = { it }, restore = { it })
     var failedPackages by rememberSaveable(stateSaver = failedSaver) { mutableStateOf(emptyList()) }
+    var isLastAppInQueue by rememberSaveable { mutableStateOf(false) }
 
     // Dialog states
     var showExitDialog by remember { mutableStateOf(false) }
@@ -146,27 +168,40 @@ fun HomeScreen(
 
     // Uninstall callback
     val onAppUninstalled: (String) -> Unit = { packageName ->
+        Timber.d("╔═══════════════════════════════════════════════════════")
+        Timber.d("║ 📲 onAppUninstalled CALLBACK")
+        Timber.d("║ Package: $packageName")
+        Timber.d("║ isSelecting: $isSelecting")
+        Timber.d("║ succeededCount BEFORE: $succeededCount")
+        Timber.d("║ uninstallQueue size BEFORE: ${uninstallQueue.size}")
+        Timber.d("║ uninstallQueue: $uninstallQueue")
+
         if (!isSelecting) {
+            Timber.d("║ Mode: SINGLE UNINSTALL")
             viewModel.removeAppByPackageName(packageName)
+            Timber.d("║ ✅ Single app removed from list")
         } else {
+            Timber.d("║ Mode: BATCH UNINSTALL")
+            Timber.d("║ BroadcastReceiver role: Track success (DON'T touch queue)")
+
+            // Track the successfully uninstalled package (don't remove from queue!)
+            succeededPackages = succeededPackages + packageName
             succeededCount += 1
-            uninstallQueue = uninstallQueue.drop(1)
+            Timber.d("║ ✅ Tracked $packageName as SUCCEEDED")
+            Timber.d("║ Total succeeded so far: $succeededCount")
+            Timber.d("║ Succeeded packages: $succeededPackages")
+            Timber.d("║ Queue unchanged (Lifecycle owns it): $uninstallQueue")
+
+            // Remove from UI
             viewModel.removeAppByPackageName(packageName)
-            if (uninstallQueue.isNotEmpty()) {
-                val nextPackage = uninstallQueue.first()
-                val uninstallIntent = Intent(Intent.ACTION_DELETE).apply {
-                    data = "package:$nextPackage".toUri()
-                }
-                context.startActivity(uninstallIntent)
-            } else {
-                isUninstalling = false
-                isSelecting = false
-                selectedApps = emptySet()
-                if (!showBatchResultDialog) {
-                    showBatchResultDialog = true
-                }
-            }
+            Timber.d("║ App removed from UI list")
+
+            Timber.d("║ ℹ️ Lifecycle observer will handle launching next app")
         }
+
+        Timber.d("║ succeededCount AFTER: $succeededCount")
+        Timber.d("║ uninstallQueue size AFTER: ${uninstallQueue.size}")
+        Timber.d("╚═══════════════════════════════════════════════════════")
     }
 
     // Register broadcast receiver
@@ -182,42 +217,6 @@ fun HomeScreen(
         }
     }
 
-    // Lifecycle observer for handling user cancellation
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME && isUninstalling && uninstallQueue.isNotEmpty()) {
-                val currentPackage = uninstallQueue.first()
-                val isAppStillInstalled = try {
-                    pm.getApplicationInfo(currentPackage, 0)
-                    true
-                } catch (_: PackageManager.NameNotFoundException) {
-                    false
-                }
-                if (isAppStillInstalled) {
-                    failedPackages = failedPackages + currentPackage
-                    uninstallQueue = uninstallQueue.drop(1)
-                    if (uninstallQueue.isNotEmpty()) {
-                        val nextPackage = uninstallQueue.first()
-                        val uninstallIntent = Intent(Intent.ACTION_DELETE).apply {
-                            data = "package:$nextPackage".toUri()
-                        }
-                        context.startActivity(uninstallIntent)
-                    } else {
-                        isUninstalling = false
-                        isSelecting = false
-                        selectedApps = emptySet()
-                        if (!showBatchResultDialog) {
-                            showBatchResultDialog = true
-                        }
-                    }
-                }
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
 
     // Load apps on launch
     if (!hasPackagePermission) {
@@ -250,10 +249,169 @@ fun HomeScreen(
         }
     }
 
+    // Trigger first app launch when batch uninstall starts
+    LaunchedEffect(isUninstalling) {
+        if (isUninstalling && uninstallQueue.isNotEmpty()) {
+            Timber.d("╔═══════════════════════════════════════════════════════")
+            Timber.d("║ 🚀 INITIAL LAUNCH - Starting batch uninstall")
+
+            delay(100) // Small delay to ensure state is settled
+
+            val firstPackage = uninstallQueue.first()
+            isLastAppInQueue = uninstallQueue.size == 1
+
+            Timber.d("║ Launching first app: $firstPackage")
+            Timber.d("║ Is last app? $isLastAppInQueue")
+
+            val uninstallIntent = Intent(Intent.ACTION_DELETE).apply {
+                data = "package:$firstPackage".toUri()
+            }
+            context.startActivity(uninstallIntent)
+
+            // Remove from queue (Lifecycle owns it)
+            uninstallQueue = uninstallQueue.drop(1)
+
+            Timber.d("║ ✅ First app launched")
+            Timber.d("║ Queue size after: ${uninstallQueue.size}")
+            Timber.d("╚═══════════════════════════════════════════════════════")
+        }
+    }
+
+    // Lifecycle observer - For ALL apps during batch uninstall
+    DisposableEffect(lifecycleOwner, isUninstalling) {
+        if (isUninstalling) {
+            Timber.d("╔═══════════════════════════════════════════════════════")
+            Timber.d("║ 📌 LIFECYCLE OBSERVER ATTACHED (Batch uninstall active)")
+            Timber.d("╚═══════════════════════════════════════════════════════")
+
+            val observer = LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME && isUninstalling) {
+                    Timber.d("╔═══════════════════════════════════════════════════════")
+                    Timber.d("║ 🔄 LIFECYCLE: ON_RESUME during batch uninstall")
+                    Timber.d("║ Lifecycle role: Launch next app OR show final results")
+
+                    // Launch coroutine to push next app
+                    coroutineScope.launch {
+                        // Small delay just to ensure state is stable (not waiting for BroadcastReceiver)
+                        delay(200)
+
+                        // Re-check state after delay
+                        if (!isUninstalling) {
+                            Timber.d("║ ℹ️ Batch uninstall already completed")
+                            Timber.d("╚═══════════════════════════════════════════════════════")
+                            return@launch
+                        }
+
+                        Timber.d("║ Queue size: ${uninstallQueue.size}")
+                        Timber.d("║ Queue: $uninstallQueue")
+
+                        if (uninstallQueue.isNotEmpty()) {
+                            // Always launch next app from queue (regardless of what happened to previous)
+                            val nextPackage = uninstallQueue.first()
+                            isLastAppInQueue = uninstallQueue.size == 1
+
+                            Timber.d("║ 🚀 Lifecycle pushing next app: $nextPackage")
+                            Timber.d("║ Remaining in queue: ${uninstallQueue.size}")
+                            Timber.d("║ Is last app? $isLastAppInQueue")
+
+                            val uninstallIntent = Intent(Intent.ACTION_DELETE).apply {
+                                data = "package:$nextPackage".toUri()
+                            }
+                            context.startActivity(uninstallIntent)
+                            Timber.d("║ ✅ Uninstall intent launched")
+
+                            // Remove from queue after pushing (Lifecycle owns the queue)
+                            uninstallQueue = uninstallQueue.drop(1)
+                            Timber.d("║ Removed from queue - new size: ${uninstallQueue.size}")
+                        } else {
+                            // Queue is empty - all apps processed, do final verification
+                            Timber.d("║ 🏁 All apps pushed - verifying final results")
+                            Timber.d("║ Original queue: $originalQueueSnapshot")
+                            Timber.d("║ Succeeded (tracked by BroadcastReceiver): $succeededPackages")
+                            Timber.d("║ Succeeded count: $succeededCount")
+
+                            // Find apps that were NOT in succeededPackages
+                            val potentiallyFailed = originalQueueSnapshot.filter { it !in succeededPackages }
+                            Timber.d("║ Potentially failed (not tracked): $potentiallyFailed")
+
+                            // Verify what's actually still installed
+                            val stillInstalled = mutableListOf<String>()
+                            Timber.d("║ Querying PackageManager for final verification:")
+
+                            potentiallyFailed.forEach { packageName ->
+                                val isInstalled = try {
+                                    pm.getApplicationInfo(packageName, 0)
+                                    Timber.d("║   ❌ $packageName - Still installed (FAILED)")
+                                    true
+                                } catch (_: PackageManager.NameNotFoundException) {
+                                    Timber.d("║   ✅ $packageName - Actually was uninstalled (BroadcastReceiver missed it)")
+                                    false
+                                }
+
+                                if (isInstalled) {
+                                    stillInstalled.add(packageName)
+                                }
+                            }
+
+                            // Final counts based on PackageManager truth
+                            failedPackages = stillInstalled
+                            val actualSucceeded = originalQueueSnapshot.size - stillInstalled.size
+                            succeededCount = actualSucceeded
+
+                            Timber.d("║ Final verified counts:")
+                            Timber.d("║   Total selected: ${originalQueueSnapshot.size}")
+                            Timber.d("║   Succeeded (verified): $succeededCount")
+                            Timber.d("║   Failed (verified): ${failedPackages.size}")
+                            Timber.d("║   Failed packages: $failedPackages")
+
+                            isUninstalling = false
+                            isSelecting = false
+                            selectedApps = emptySet()
+                            isLastAppInQueue = false
+                            succeededPackages = emptyList()
+
+                            if (!showBatchResultDialog) {
+                                Timber.d("║ 📊 Showing result dialog...")
+                                showBatchResultDialog = true
+                            }
+                        }
+
+                        Timber.d("╚═══════════════════════════════════════════════════════")
+                    }
+                }
+            }
+
+            lifecycleOwner.lifecycle.addObserver(observer)
+            onDispose {
+                Timber.d("║ 📌 LIFECYCLE OBSERVER REMOVED")
+                lifecycleOwner.lifecycle.removeObserver(observer)
+            }
+        } else {
+            onDispose { }
+        }
+    }
+
     // Back handler
     BackHandler(enabled = true) {
         when {
             isSettingsVisible -> isSettingsVisible = false
+            isUninstalling -> {
+                // User pressed back during uninstall - mark remaining as failed
+                Timber.d("╔═══════════════════════════════════════════════════════")
+                Timber.d("║ ❌ USER PRESSED BACK DURING UNINSTALL")
+                Timber.d("║ Marking remaining ${uninstallQueue.size} apps as failed")
+
+                failedPackages = failedPackages + uninstallQueue
+                uninstallQueue = emptyList()
+                isUninstalling = false
+                isSelecting = false
+                selectedApps = emptySet()
+                showBatchResultDialog = true
+
+                Timber.d("║ Total succeeded: $succeededCount")
+                Timber.d("║ Total failed: ${failedPackages.size}")
+                Timber.d("╚═══════════════════════════════════════════════════════")
+            }
             isSelecting -> {
                 if (selectedApps.isNotEmpty()) {
                     showCancelConfirmationDialog = true
@@ -404,48 +562,73 @@ fun HomeScreen(
                 onConfirmUninstall = {
                     showUninstallConfirm = false
                     if (selectedApps.isNotEmpty()) {
+                        Timber.d("╔═══════════════════════════════════════════════════════")
+                        Timber.d("║ 🚀 BATCH UNINSTALL STARTED")
+                        Timber.d("║ Total apps selected: ${selectedApps.size}")
+                        Timber.d("║ Selected packages: $selectedApps")
+
                         uninstallQueue = selectedApps.filter { packageName ->
                             try {
                                 val appInfo = pm.getApplicationInfo(packageName, 0)
                                 (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0
                             } catch (_: PackageManager.NameNotFoundException) {
-                                Timber.d("Package not found: $packageName")
+                                Timber.d("║ ⚠️ Package not found: $packageName")
                                 false
                             }
                         }
 
-                        totalSelectedAtStart = uninstallQueue.size
+                        Timber.d("║ Non-system apps to uninstall: ${uninstallQueue.size}")
+                        Timber.d("║ Uninstall queue: $uninstallQueue")
+
+                        // Save snapshot of original queue for final verification
+                        originalQueueSnapshot = uninstallQueue
+                        Timber.d("║ Original queue snapshot saved: $originalQueueSnapshot")
+
+                        succeededPackages = emptyList()
                         failedPackages = emptyList()
                         succeededCount = 0
                         showBatchResultDialog = false
 
+                        Timber.d("║ Tracking variables reset")
+                        Timber.d("║ succeededCount: $succeededCount")
+                        Timber.d("║ failedPackages: ${failedPackages.size}")
+
                         if (uninstallQueue.isNotEmpty()) {
                             isUninstalling = true
-                            val firstPackage = uninstallQueue.first()
-                            val uninstallIntent = Intent(Intent.ACTION_DELETE).apply {
-                                data = "package:$firstPackage".toUri()
-                            }
-                            context.startActivity(uninstallIntent)
+                            Timber.d("║ ✅ Batch uninstall mode activated")
+                            Timber.d("║ Lifecycle observer will handle launching apps")
                         } else {
+                            Timber.d("║ ❌ No apps to uninstall (all are system apps)")
                             viewModel.setError("Selected apps are system apps and cannot be uninstalled.")
                             isSelecting = false
                             selectedApps = emptySet()
                         }
+
+                        Timber.d("╚═══════════════════════════════════════════════════════")
                     }
                 }
             )
         }
 
         if (showBatchResultDialog) {
+            Timber.d("╔═══════════════════════════════════════════════════════")
+            Timber.d("║ 📊 SHOWING BATCH RESULT DIALOG")
+            Timber.d("║ totalSelected: ${originalQueueSnapshot.size}")
+            Timber.d("║ succeededCount: $succeededCount")
+            Timber.d("║ failedPackages count: ${failedPackages.size}")
+            Timber.d("║ failedPackages: $failedPackages")
+            Timber.d("╚═══════════════════════════════════════════════════════")
+
             BatchUninstallResultDialog(
-                totalSelected = totalSelectedAtStart,
+                totalSelected = originalQueueSnapshot.size,
                 succeededCount = succeededCount,
                 failedPackages = failedPackages,
                 onDismiss = {
+                    Timber.d("║ 🔚 Result dialog dismissed")
                     showBatchResultDialog = false
                     failedPackages = emptyList()
-                    totalSelectedAtStart = 0
                     succeededCount = 0
+                    originalQueueSnapshot = emptyList()
                 }
             )
         }
