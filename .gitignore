@@ -1,21 +1,16 @@
 *.iml
 .gradle
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
 .DS_Store
 /build
 /captures
 .externalNativeBuild
 .cxx
 local.properties
-/claude/
-/.idea/copilot.data.migration.agent.xml
-/.idea/copilot.data.migration.ask.xml
-/.idea/copilot.data.migration.ask2agent.xml
-/.idea/copilot.data.migration.edit.xml
+
+# IDE
+.idea/
+
+# Claude
+.claude/
 .claudeagent
