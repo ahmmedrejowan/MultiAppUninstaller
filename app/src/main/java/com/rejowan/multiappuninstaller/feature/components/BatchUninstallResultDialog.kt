@@ -52,6 +52,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
+import com.rejowan.multiappuninstaller.ui.theme.AccentColors
 
 /**
  * Batch Uninstall Result Dialog
@@ -124,14 +125,14 @@ fun BatchUninstallResultDialog(
                     Icon(
                         imageVector = Icons.Outlined.CheckCircle,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = AccentColors.Green
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
                         text = "Uninstalled: $succeededCount",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.primary
+                        color = AccentColors.Green
                     )
                 }
 
@@ -145,13 +146,13 @@ fun BatchUninstallResultDialog(
                     Icon(
                         imageVector = Icons.Outlined.ErrorOutline,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error
+                        tint = AccentColors.Red
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
                         text = "Failed/Cancelled: $failedCount",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.error,
+                        color = AccentColors.Red,
                         fontWeight = FontWeight.Medium
                     )
                 }

@@ -74,7 +74,7 @@ fun SelectionBottomBar(
                 .padding(horizontal = 4.dp)
                 .fillMaxWidth()
                 .background(
-                    MaterialTheme.colorScheme.background, shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                    MaterialTheme.colorScheme.surfaceContainerHigh, shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                 )
                 .navigationBarsPadding()
                 .padding(horizontal = 12.dp)

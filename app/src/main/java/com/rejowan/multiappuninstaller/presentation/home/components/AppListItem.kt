@@ -47,6 +47,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
+import com.rejowan.multiappuninstaller.ui.theme.AccentColors
 import com.rejowan.multiappuninstaller.utils.DateFormatUtils
 import java.io.File
 
@@ -103,9 +104,9 @@ fun AppListItem(
             ),
         colors = CardDefaults.outlinedCardColors(
             containerColor = if (isSelected) {
-                MaterialTheme.colorScheme.secondaryContainer
+                AccentColors.Purple.copy(alpha = 0.12f)
             } else {
-                MaterialTheme.colorScheme.surface
+                MaterialTheme.colorScheme.surfaceContainerLow
             }
         ),
         elevation = CardDefaults.outlinedCardElevation(
@@ -137,11 +138,7 @@ fun AppListItem(
                 Text(
                     text = appName,
                     style = MaterialTheme.typography.titleMedium,
-                    color = if (isSelected) {
-                        MaterialTheme.colorScheme.onSecondaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.onSurface
-                    },
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -150,11 +147,7 @@ fun AppListItem(
                 Text(
                     text = packageName,
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (isSelected) {
-                        MaterialTheme.colorScheme.onSecondaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    },
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -163,11 +156,7 @@ fun AppListItem(
                 Text(
                     text = "$appSize • $installDate",
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (isSelected) {
-                        MaterialTheme.colorScheme.onSecondaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    }
+                    color = MaterialTheme.colorScheme.outline
                 )
             }
 
