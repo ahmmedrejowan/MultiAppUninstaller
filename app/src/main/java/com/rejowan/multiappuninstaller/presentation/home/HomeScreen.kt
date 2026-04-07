@@ -64,11 +64,11 @@ import com.rejowan.multiappuninstaller.feature.components.ConfirmUninstallDialog
 import com.rejowan.multiappuninstaller.feature.components.ExitConfirmationDialog
 import com.rejowan.multiappuninstaller.feature.components.HowToUseDialog
 import com.rejowan.multiappuninstaller.feature.components.SelectionBottomBar
+import com.rejowan.multiappuninstaller.feature.components.SortBottomSheet
 import com.rejowan.multiappuninstaller.presentation.settings.SettingsScreen
 import com.rejowan.multiappuninstaller.presentation.home.components.AppListItem
 import com.rejowan.multiappuninstaller.presentation.home.components.EmptySearchState
 import com.rejowan.multiappuninstaller.presentation.home.components.ErrorState
-import com.rejowan.multiappuninstaller.presentation.home.components.FilterSection
 import com.rejowan.multiappuninstaller.presentation.home.components.HomeTopBar
 import com.rejowan.multiappuninstaller.presentation.home.components.LoadingState
 import com.rejowan.multiappuninstaller.presentation.home.components.NoAppsState
@@ -115,6 +115,7 @@ fun HomeScreen(
     var sortAscending by rememberSaveable { mutableStateOf(true) }
     var isRefreshing by remember { mutableStateOf(false) }
     var isSettingsVisible by remember { mutableStateOf(false) }
+    var showSortSheet by remember { mutableStateOf(false) }
 
     // LazyList state for scroll control
     val listState = rememberLazyListState()
@@ -471,18 +472,11 @@ fun HomeScreen(
                 modifier = Modifier.padding(innerPadding)
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    // Search Bar
+                    // Search Bar with Sort button
                     SearchSection(
                         query = searchQuery,
-                        onQueryChange = { searchQuery = it }
-                    )
-
-                    // Filter Section
-                    FilterSection(
-                        selectedSortType = sortType,
-                        sortAscending = sortAscending,
-                        onSortTypeChange = { sortType = it },
-                        onSortDirectionToggle = { sortAscending = !sortAscending }
+                        onQueryChange = { searchQuery = it },
+                        onSortClick = { showSortSheet = true }
                     )
 
                     // Content
@@ -630,6 +624,18 @@ fun HomeScreen(
                     succeededCount = 0
                     originalQueueSnapshot = emptyList()
                 }
+            )
+        }
+
+        if (showSortSheet) {
+            SortBottomSheet(
+                currentSortType = sortType,
+                sortAscending = sortAscending,
+                onSortSelected = { type, ascending ->
+                    sortType = type
+                    sortAscending = ascending
+                },
+                onDismiss = { showSortSheet = false }
             )
         }
 
