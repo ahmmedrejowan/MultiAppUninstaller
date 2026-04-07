@@ -94,14 +94,6 @@ fun AppListItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp)
-            .combinedClickable(
-                onClick = {
-                    if (isSelecting) onToggle() else onNormalClick()
-                },
-                onLongClick = {
-                    if (!isSelecting) onStartSelection() else onToggle()
-                }
-            )
             .then(
                 if (isSelected) {
                     Modifier.border(
@@ -122,6 +114,15 @@ fun AppListItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .combinedClickable(
+                    onClick = {
+                        if (isSelecting) onToggle() else onNormalClick()
+                    },
+                    onLongClick = {
+                        if (!isSelecting) onStartSelection() else onToggle()
+                    }
+                )
                 .padding(14.dp),
             horizontalArrangement = Arrangement.spacedBy(14.dp),
             verticalAlignment = Alignment.CenterVertically
