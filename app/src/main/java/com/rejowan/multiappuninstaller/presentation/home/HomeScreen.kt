@@ -62,7 +62,7 @@ import com.rejowan.multiappuninstaller.feature.components.BatchUninstallResultDi
 import com.rejowan.multiappuninstaller.feature.components.CancelConfirmationDialog
 import com.rejowan.multiappuninstaller.feature.components.ConfirmUninstallDialog
 import com.rejowan.multiappuninstaller.feature.components.ExitConfirmationDialog
-import com.rejowan.multiappuninstaller.feature.components.HowToUseDialog
+import com.rejowan.multiappuninstaller.feature.components.OnboardingScreen
 import com.rejowan.multiappuninstaller.feature.components.SelectionBottomBar
 import com.rejowan.multiappuninstaller.feature.components.SortBottomSheet
 import com.rejowan.multiappuninstaller.presentation.settings.SettingsScreen
@@ -640,7 +640,7 @@ fun HomeScreen(
         }
 
         if (showFirstTutorial == true) {
-            HowToUseDialog(onDismiss = { viewModel.setFirstLaunchDone() })
+            OnboardingScreen(onComplete = { viewModel.setFirstLaunchDone() })
         }
 
         detailsFor?.let { pkg ->
