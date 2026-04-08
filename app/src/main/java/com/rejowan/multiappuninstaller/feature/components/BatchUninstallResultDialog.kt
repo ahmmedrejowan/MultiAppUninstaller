@@ -61,7 +61,6 @@ import com.rejowan.multiappuninstaller.ui.theme.AccentColors
  * @param succeededCount number of apps actually uninstalled
  * @param failedPackages list of package names that failed/cancelled
  * @param onDismiss close dialog callback
- * @param onRetryFailed optional retry action for failed list (shows button if provided and there are failures)
  */
 @Composable
 fun BatchUninstallResultDialog(
