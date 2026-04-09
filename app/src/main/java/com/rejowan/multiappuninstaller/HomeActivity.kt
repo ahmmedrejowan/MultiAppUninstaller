@@ -22,19 +22,50 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.rejowan.multiappuninstaller.presentation.home.HomeScreen
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.compose.rememberNavController
+import com.rejowan.multiappuninstaller.data.FirstLaunchHelper
+import com.rejowan.multiappuninstaller.presentation.navigation.AppNavHost
 import com.rejowan.multiappuninstaller.ui.theme.MAUTheme
+import kotlinx.coroutines.launch
 
 class HomeActivity : ComponentActivity() {
 
+    private var isReady by mutableStateOf(false)
+    private var showOnboarding by mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-        installSplashScreen()
         enableEdgeToEdge()
+
+        splashScreen.setKeepOnScreenCondition { !isReady }
+
+        val firstLaunchHelper = FirstLaunchHelper(this)
+
+        lifecycleScope.launch {
+            showOnboarding = firstLaunchHelper.isFirstLaunch()
+            isReady = true
+        }
+
         setContent {
             MAUTheme {
-                HomeScreen()
+                if (isReady) {
+                    val navController = rememberNavController()
+                    AppNavHost(
+                        navController = navController,
+                        showOnboarding = showOnboarding,
+                        onOnboardingComplete = {
+                            lifecycleScope.launch {
+                                firstLaunchHelper.setFirstLaunchDone()
+                            }
+                        }
+                    )
+                }
             }
         }
     }

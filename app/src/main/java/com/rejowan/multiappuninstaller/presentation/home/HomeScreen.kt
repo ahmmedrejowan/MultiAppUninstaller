@@ -62,7 +62,6 @@ import com.rejowan.multiappuninstaller.feature.components.BatchUninstallResultDi
 import com.rejowan.multiappuninstaller.feature.components.CancelConfirmationDialog
 import com.rejowan.multiappuninstaller.feature.components.ConfirmUninstallDialog
 import com.rejowan.multiappuninstaller.feature.components.ExitConfirmationDialog
-import com.rejowan.multiappuninstaller.feature.components.OnboardingScreen
 import com.rejowan.multiappuninstaller.feature.components.SelectionBottomBar
 import com.rejowan.multiappuninstaller.feature.components.SortBottomSheet
 import com.rejowan.multiappuninstaller.presentation.settings.SettingsScreen
@@ -100,8 +99,6 @@ fun HomeScreen(
     val appList by viewModel.apps.collectAsState()
     val appListError by viewModel.error.collectAsState()
     val appListLoading by viewModel.loading.collectAsState()
-    val showFirstTutorial by viewModel.isFirstLaunch.collectAsState()
-
     // Permission check
     val hasPackagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         context.checkSelfPermission(Manifest.permission.QUERY_ALL_PACKAGES) == PackageManager.PERMISSION_GRANTED
@@ -224,11 +221,6 @@ fun HomeScreen(
         LaunchedEffect(Unit) { viewModel.setError("Permission not granted to access app list.") }
     } else {
         LaunchedEffect(Unit) { viewModel.loadApps() }
-    }
-
-    // Check first launch
-    LaunchedEffect(Unit) {
-        viewModel.checkFirstLaunch()
     }
 
     // Scroll to top when sort changes (not on search - user wants to see results where they are)
@@ -637,10 +629,6 @@ fun HomeScreen(
                 },
                 onDismiss = { showSortSheet = false }
             )
-        }
-
-        if (showFirstTutorial == true) {
-            OnboardingScreen(onComplete = { viewModel.setFirstLaunchDone() })
         }
 
         detailsFor?.let { pkg ->

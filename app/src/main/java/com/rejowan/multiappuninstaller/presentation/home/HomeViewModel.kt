@@ -45,9 +45,6 @@ class HomeViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
-    private val _isFirstLaunch = MutableStateFlow<Boolean?>(null)
-    val isFirstLaunch: StateFlow<Boolean?> = _isFirstLaunch
-
     private val _theme = MutableStateFlow("System Default")
     val theme: StateFlow<String> = _theme
 
@@ -92,29 +89,6 @@ class HomeViewModel(
      */
     fun setError(message: String) {
         _error.value = message
-    }
-
-    /**
-     * Checks if this is the first time the app is launched
-     */
-    fun checkFirstLaunch() {
-        viewModelScope.launch {
-            val result = mainRepository.isFirstLaunch()
-            _isFirstLaunch.value = result
-            if (BuildConfig.DEBUG) {
-                Timber.d("Is first launch: $result")
-            }
-        }
-    }
-
-    /**
-     * Marks first launch as complete
-     */
-    fun setFirstLaunchDone() {
-        viewModelScope.launch {
-            _isFirstLaunch.value = false
-            mainRepository.setFirstLaunchDone()
-        }
     }
 
     /**

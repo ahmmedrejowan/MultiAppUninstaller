@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     id("kotlin-parcelize")
 
 }
@@ -90,6 +91,10 @@ dependencies {
     // data store
     implementation(libs.androidx.datastore.preferences)
 
+
+    // navigation
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
 
     // timber
     implementation(libs.timber)

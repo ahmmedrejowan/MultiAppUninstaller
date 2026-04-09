@@ -46,10 +46,7 @@ data class HomeState(
     val showExitDialog: Boolean = false,
     val showCancelConfirmationDialog: Boolean = false,
     val showUninstallConfirmDialog: Boolean = false,
-    val showBatchResultDialog: Boolean = false,
-
-    // First launch tutorial
-    val showFirstTutorial: Boolean = false
+    val showBatchResultDialog: Boolean = false
 )
 
 /**
