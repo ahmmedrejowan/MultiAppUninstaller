@@ -39,7 +39,7 @@ class HomeViewModel(
     private val _apps = MutableStateFlow<List<PackageInfo>>(emptyList())
     val apps: StateFlow<List<PackageInfo>> = _apps
 
-    private val _loading = MutableStateFlow(false)
+    private val _loading = MutableStateFlow(true)
     val loading: StateFlow<Boolean> = _loading
 
     private val _error = MutableStateFlow<String?>(null)
