@@ -40,7 +40,7 @@ uninstall multiple apps at once. That's how the idea of Multi App Uninstaller ca
 
 You can download the latest APK from here
 
-<a href="https://github.com/ahmmedrejowan/MultiAppUninstaller/releases/download/0.2.0/MAU.0.2.0.apk">
+<a href="https://github.com/ahmmedrejowan/MultiAppUninstaller/releases/download/1.0.0/MAU.1.0.0.apk">
 <img src="https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/get.png" width="224px" align="center"/>
 </a>
 
@@ -59,6 +59,13 @@ To build and run the project, follow these steps:
 5. Click on the "Run" button in Android Studio to build and run the app.
 
 ## ChangeLog
+
+- [v1.0.0](https://github.com/ahmmedrejowan/MultiAppUninstaller/releases/tag/1.0.0)
+  - Linky-style onboarding with animated pager
+  - Type-safe Jetpack Compose navigation
+  - App update checking via GitHub with configurable interval
+  - Shimmer loading and redesigned app list, search, and empty states
+  - AMOLED-optimized dark theme with accent colors
 
 - [v0.2.0](https://github.com/ahmmedrejowan/MultiAppUninstaller/releases/tag/0.2.0)
   - Redesigned Settings Screen with improved UI

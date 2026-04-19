@@ -325,7 +325,7 @@ fun ChangelogSheet(onDismiss: () -> Unit) {
             Spacer(modifier = Modifier.height(20.dp))
 
             ChangelogVersion(
-                version = "0.3.0",
+                version = "1.0.0",
                 date = "April 2026",
                 changes = listOf(
                     "Linky-style onboarding screen",

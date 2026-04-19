@@ -95,6 +95,8 @@ Issues that have been fixed in recent releases:
 
 | Issue | Fixed In | Description |
 |-------|----------|-------------|
+| Home screen flash before onboarding | v1.0.0 | Navigation gated by splash + type-safe routes |
+| Keyboard not dismissing on tap outside | v1.0.0 | Added tap/back/Done focus clear |
 | - | v0.2.0 | Material 3 redesign |
 
 ---
