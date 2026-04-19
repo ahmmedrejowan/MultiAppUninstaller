@@ -117,6 +117,7 @@ fun HomeScreen(
     var isRefreshing by remember { mutableStateOf(false) }
     var isSettingsVisible by remember { mutableStateOf(false) }
     var showSortSheet by remember { mutableStateOf(false) }
+    var isSearchFocused by remember { mutableStateOf(false) }
 
     // LazyList state for scroll control
     val listState = rememberLazyListState()
@@ -391,6 +392,7 @@ fun HomeScreen(
     // Back handler
     BackHandler(enabled = true) {
         when {
+            isSearchFocused -> focusManager.clearFocus()
             isSettingsVisible -> isSettingsVisible = false
             isUninstalling -> {
                 // User pressed back during uninstall - mark remaining as failed
@@ -476,7 +478,8 @@ fun HomeScreen(
                     SearchSection(
                         query = searchQuery,
                         onQueryChange = { searchQuery = it },
-                        onSortClick = { showSortSheet = true }
+                        onSortClick = { showSortSheet = true },
+                        onFocusChanged = { isSearchFocused = it }
                     )
 
                     // Content
