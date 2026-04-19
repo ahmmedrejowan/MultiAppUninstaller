@@ -30,13 +30,17 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.rejowan.multiappuninstaller.data.FirstLaunchHelper
 import com.rejowan.multiappuninstaller.presentation.navigation.AppNavHost
+import com.rejowan.multiappuninstaller.repo.UpdateRepository
 import com.rejowan.multiappuninstaller.ui.theme.MAUTheme
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
 class HomeActivity : ComponentActivity() {
 
     private var isReady by mutableStateOf(false)
     private var showOnboarding by mutableStateOf(false)
+
+    private val updateRepository: UpdateRepository by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
@@ -50,6 +54,9 @@ class HomeActivity : ComponentActivity() {
         lifecycleScope.launch {
             showOnboarding = firstLaunchHelper.isFirstLaunch()
             isReady = true
+            if (!showOnboarding) {
+                updateRepository.runCheckIfNeeded(BuildConfig.VERSION_NAME)
+            }
         }
 
         setContent {
@@ -62,6 +69,7 @@ class HomeActivity : ComponentActivity() {
                         onOnboardingComplete = {
                             lifecycleScope.launch {
                                 firstLaunchHelper.setFirstLaunchDone()
+                                updateRepository.runCheckIfNeeded(BuildConfig.VERSION_NAME)
                             }
                         }
                     )

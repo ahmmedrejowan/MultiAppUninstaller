@@ -21,10 +21,13 @@ package com.rejowan.multiappuninstaller.di
 import com.rejowan.multiappuninstaller.data.ApkDownloadManager
 import com.rejowan.multiappuninstaller.data.FirstLaunchHelper
 import com.rejowan.multiappuninstaller.data.ThemePrefHelper
+import com.rejowan.multiappuninstaller.data.UpdatePrefHelper
 import com.rejowan.multiappuninstaller.presentation.home.HomeViewModel
 import com.rejowan.multiappuninstaller.presentation.settings.SettingsViewModel
 import com.rejowan.multiappuninstaller.repo.MainRepository
+import com.rejowan.multiappuninstaller.repo.UpdateRepository
 import com.rejowan.multiappuninstaller.repoImpl.MainRepositoryImpl
+import com.rejowan.multiappuninstaller.repoImpl.UpdateRepositoryImpl
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -32,10 +35,12 @@ import org.koin.dsl.module
 val mainModule = module {
     single { ThemePrefHelper(get()) }
     single { FirstLaunchHelper(get()) }
+    single { UpdatePrefHelper(get()) }
     single { ApkDownloadManager(get()) }
     single<MainRepository> { MainRepositoryImpl(get(), get(), get()) }
+    single<UpdateRepository> { UpdateRepositoryImpl(get()) }
 
     // ViewModels
     viewModel { HomeViewModel(get()) }
-    viewModel { SettingsViewModel(get(), get()) }
+    viewModel { SettingsViewModel(get(), get(), get()) }
 }

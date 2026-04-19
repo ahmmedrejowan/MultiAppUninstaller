@@ -12,9 +12,9 @@ import com.rejowan.multiappuninstaller.BuildConfig
 import com.rejowan.multiappuninstaller.data.ApkDownloadManager
 import com.rejowan.multiappuninstaller.data.GithubRelease
 import com.rejowan.multiappuninstaller.data.UpdateCheckInterval
-import com.rejowan.multiappuninstaller.data.UpdateChecker
 import com.rejowan.multiappuninstaller.data.UpdateState
 import com.rejowan.multiappuninstaller.repo.MainRepository
+import com.rejowan.multiappuninstaller.repo.UpdateRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +23,7 @@ import timber.log.Timber
 
 class SettingsViewModel(
     private val repository: MainRepository,
+    private val updateRepository: UpdateRepository,
     private val apkDownloadManager: ApkDownloadManager
 ) : ViewModel() {
 
@@ -32,16 +33,39 @@ class SettingsViewModel(
     private val _dynamicColorEnabled = MutableStateFlow(false)
     val dynamicColorEnabled: StateFlow<Boolean> = _dynamicColorEnabled
 
-    private val _updateState = MutableStateFlow<UpdateState>(UpdateState.Idle)
-    val updateState: StateFlow<UpdateState> = _updateState
+    val updateState: StateFlow<UpdateState> = updateRepository.updateState
 
-    private val _downloadState = MutableStateFlow<ApkDownloadManager.DownloadState>(ApkDownloadManager.DownloadState.Idle)
+    private val _downloadState =
+        MutableStateFlow<ApkDownloadManager.DownloadState>(ApkDownloadManager.DownloadState.Idle)
     val downloadState: StateFlow<ApkDownloadManager.DownloadState> = _downloadState
 
     private val _updateCheckInterval = MutableStateFlow(UpdateCheckInterval.WEEKLY)
     val updateCheckInterval: StateFlow<UpdateCheckInterval> = _updateCheckInterval
 
     private var downloadJob: Job? = null
+
+    init {
+        observeUpdateCheckInterval()
+        checkPendingApk()
+    }
+
+    private fun observeUpdateCheckInterval() {
+        viewModelScope.launch {
+            updateRepository.getUpdateCheckInterval().collect { _updateCheckInterval.value = it }
+        }
+    }
+
+    private fun checkPendingApk() {
+        val currentVersion = BuildConfig.VERSION_NAME
+        if (apkDownloadManager.hasPendingApk(currentVersion)) {
+            apkDownloadManager.getPendingApk()?.let { file ->
+                Timber.d("Pending APK detected: ${file.name}")
+                _downloadState.value = ApkDownloadManager.DownloadState.Completed(file)
+            }
+        } else {
+            apkDownloadManager.cleanupOldDownloads()
+        }
+    }
 
     fun loadTheme() {
         viewModelScope.launch {
@@ -80,34 +104,19 @@ class SettingsViewModel(
 
     fun checkForUpdates() {
         viewModelScope.launch {
-            _updateState.value = UpdateState.Checking
-            val currentVersion = BuildConfig.VERSION_NAME
-
-            val result = UpdateChecker.checkForUpdate(currentVersion)
-            result.fold(
-                onSuccess = { release ->
-                    _updateState.value = if (release != null) {
-                        UpdateState.Available(release, currentVersion)
-                    } else {
-                        UpdateState.UpToDate
-                    }
-                },
-                onFailure = { e ->
-                    Timber.e(e, "Update check failed")
-                    _updateState.value = UpdateState.Error(e.message ?: "Unknown error")
-                }
-            )
+            updateRepository.runCheck(BuildConfig.VERSION_NAME)
         }
     }
 
     fun dismissUpdateDialog() {
-        _updateState.value = UpdateState.Idle
+        updateRepository.dismissUpdate()
     }
 
     fun skipVersion(version: String) {
-        // For simplicity, just dismiss. A full implementation would persist skipped versions in DataStore.
-        _updateState.value = UpdateState.Idle
-        Timber.d("Skipped version: $version")
+        viewModelScope.launch {
+            updateRepository.skipVersion(version)
+            Timber.d("Skipped version: $version")
+        }
     }
 
     fun getApkDownloadUrl(release: GithubRelease): String? {
@@ -147,6 +156,9 @@ class SettingsViewModel(
     fun openInstallPermissionSettings(): Intent? = apkDownloadManager.getInstallPermissionIntent()
 
     fun setUpdateCheckInterval(interval: UpdateCheckInterval) {
-        _updateCheckInterval.value = interval
+        viewModelScope.launch {
+            updateRepository.setUpdateCheckInterval(interval)
+            Timber.d("Update check interval changed to: ${interval.displayName}")
+        }
     }
 }
