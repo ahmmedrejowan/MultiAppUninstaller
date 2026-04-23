@@ -15,6 +15,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
@@ -84,6 +85,7 @@ import com.rejowan.multiappuninstaller.presentation.settings.components.OpenSour
 import com.rejowan.multiappuninstaller.presentation.settings.components.PrivacyPolicySheet
 import com.rejowan.multiappuninstaller.presentation.settings.components.ThemePickerSheet
 import com.rejowan.multiappuninstaller.presentation.settings.components.UpdateIntervalSheet
+import com.rejowan.multiappuninstaller.ui.theme.AccentColors
 import com.rejowan.multiappuninstaller.ui.theme.SoftAccents
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
@@ -124,6 +126,7 @@ fun SettingsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
     ) {
         // Top bar
@@ -214,7 +217,7 @@ fun SettingsScreen(
                     icon = Icons.Rounded.InstallMobile,
                     title = "Download Update",
                     subtitle = "v${release.version} is ready",
-                    accentColor = Color(0xFF4CAF50),
+                    accentColor = AccentColors.Green,
                     onClick = {
                         // The UpdateAvailableSheet handles this — just let it show
                     },
@@ -443,10 +446,13 @@ private fun SettingsHeaderCard() {
                 shape = RoundedCornerShape(14.dp),
                 color = MaterialTheme.colorScheme.primary
             ) {
-                Image(
-                    painter = painterResource(id = R.mipmap.ic_launcher_foreground),
+                Icon(
+                    painter = painterResource(id = R.drawable.img_splash_logo),
                     contentDescription = "App logo",
-                    modifier = Modifier.fillMaxSize()
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(12.dp)
                 )
             }
 

@@ -50,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import com.rejowan.multiappuninstaller.ui.theme.AccentColors
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -154,14 +155,14 @@ private fun CompletedSection(versionName: String, canInstall: Boolean, onInstall
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    StatusIcon(Icons.Rounded.CheckCircle, Color(0xFF4CAF50).copy(alpha = 0.15f), Color(0xFF4CAF50))
+    StatusIcon(Icons.Rounded.CheckCircle, AccentColors.Green.copy(alpha = 0.15f), AccentColors.Green)
     Spacer(modifier = Modifier.height(16.dp))
     Text("Download Complete", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
     Text("v$versionName is ready to install", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     Spacer(modifier = Modifier.height(24.dp))
 
     if (canInstallApks) {
-        Button(onClick = onInstall, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))) {
+        Button(onClick = onInstall, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(containerColor = AccentColors.Green)) {
             Icon(Icons.Rounded.InstallMobile, contentDescription = null, modifier = Modifier.size(18.dp))
             Spacer(modifier = Modifier.width(8.dp))
             Text("Install Update")

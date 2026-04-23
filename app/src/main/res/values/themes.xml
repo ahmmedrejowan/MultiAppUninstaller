@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.MultiAppUninstaller" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.MultiAppUninstaller" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/backgroundColor</item>
+    </style>
 
     <style name="Theme.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/backgroundColor</item>

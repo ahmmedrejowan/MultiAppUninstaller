@@ -48,7 +48,7 @@ val inversePrimaryDark = Color(0xFF9181F4)
 object DarkSurfaces {
     val background = Color(0xFF0A0A0F)
     val onBackground = Color(0xFFE8E5F0)
-    val surface = Color(0xFF0A0A0F)
+    val surface = Color(0xFF16151C)
     val onSurface = Color(0xFFE8E5F0)
     val surfaceVariant = Color(0xFF3D3A47)
     val onSurfaceVariant = Color(0xFFC9C5D4)
