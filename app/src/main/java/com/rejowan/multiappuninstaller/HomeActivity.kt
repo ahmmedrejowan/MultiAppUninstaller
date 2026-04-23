@@ -41,6 +41,7 @@ class HomeActivity : ComponentActivity() {
     private var showOnboarding by mutableStateOf(false)
 
     private val updateRepository: UpdateRepository by inject()
+    private val firstLaunchHelper: FirstLaunchHelper by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
@@ -48,8 +49,6 @@ class HomeActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         splashScreen.setKeepOnScreenCondition { !isReady }
-
-        val firstLaunchHelper = FirstLaunchHelper(this)
 
         lifecycleScope.launch {
             showOnboarding = firstLaunchHelper.isFirstLaunch()

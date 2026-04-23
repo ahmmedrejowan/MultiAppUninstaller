@@ -37,7 +37,7 @@ val mainModule = module {
     single { FirstLaunchHelper(get()) }
     single { UpdatePrefHelper(get()) }
     single { ApkDownloadManager(get()) }
-    single<MainRepository> { MainRepositoryImpl(get(), get(), get()) }
+    single<MainRepository> { MainRepositoryImpl(get(), get()) }
     single<UpdateRepository> { UpdateRepositoryImpl(get()) }
 
     // ViewModels

@@ -22,13 +22,13 @@ import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
-import com.rejowan.multiappuninstaller.data.FirstLaunchHelper
 import com.rejowan.multiappuninstaller.data.ThemePrefHelper
 import com.rejowan.multiappuninstaller.repo.MainRepository
 import kotlinx.coroutines.flow.Flow
 
 class MainRepositoryImpl(
-    private val context: Context, private val firstLaunchHelper: FirstLaunchHelper, private val themePrefHelper: ThemePrefHelper
+    private val context: Context,
+    private val themePrefHelper: ThemePrefHelper
 ) : MainRepository {
 
 
@@ -51,15 +51,6 @@ class MainRepositoryImpl(
             return emptyList()
         }
     }
-
-    override suspend fun isFirstLaunch(): Boolean {
-        return firstLaunchHelper.isFirstLaunch()
-    }
-
-    override suspend fun setFirstLaunchDone() {
-        firstLaunchHelper.setFirstLaunchDone()
-    }
-
 
     override suspend fun saveTheme(theme: String) {
         themePrefHelper.saveTheme(theme)

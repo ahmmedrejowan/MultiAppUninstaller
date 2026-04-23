@@ -25,10 +25,6 @@ interface MainRepository {
 
     suspend fun getAppList(): List<PackageInfo>
 
-    suspend fun isFirstLaunch(): Boolean
-
-    suspend fun setFirstLaunchDone()
-
     suspend fun saveTheme(theme: String)
 
     fun getTheme(): Flow<String>
