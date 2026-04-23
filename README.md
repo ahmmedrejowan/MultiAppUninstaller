@@ -32,8 +32,8 @@ uninstall multiple apps at once. That's how the idea of Multi App Uninstaller ca
 
 | Shots                                                                                                   | Shots                                                                                                   | Shots                                                                                                   |
 |---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
-| ![Screenshot 1](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/0.jpg) | ![Screenshot 2](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/1.jpg) | ![Screenshot 5](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/2.jpg) |
-| ![Screenshot 6](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/3.jpg) | ![Screenshot 3](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/4.jpg) | ![Screenshot 4](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/5.jpg) |
+| ![Screenshot 1](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/shot1.webp) | ![Screenshot 2](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/shot2.webp) | ![Screenshot 3](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/shot3.webp) |
+| ![Screenshot 4](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/shot4.webp) | ![Screenshot 5](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/shot5.webp) | ![Screenshot 6](https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/shot6.webp) |
 
 ## Download 
 ![GitHub Release](https://img.shields.io/github/v/release/ahmmedrejowan/MultiAppUninstaller)
