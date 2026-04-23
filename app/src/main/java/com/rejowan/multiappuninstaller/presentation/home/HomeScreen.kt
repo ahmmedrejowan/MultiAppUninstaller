@@ -75,6 +75,9 @@ import com.rejowan.multiappuninstaller.presentation.home.components.HomeTopBar
 import com.rejowan.multiappuninstaller.presentation.home.components.LoadingState
 import com.rejowan.multiappuninstaller.presentation.home.components.NoAppsState
 import com.rejowan.multiappuninstaller.presentation.home.components.SearchSection
+import com.rejowan.multiappuninstaller.presentation.home.components.UpdateBanner
+import com.rejowan.multiappuninstaller.data.UpdateState
+import com.rejowan.multiappuninstaller.repo.UpdateRepository
 import com.rejowan.multiappuninstaller.receivers.AppUninstallReceiver
 import com.rejowan.multiappuninstaller.utils.SortConfig
 import com.rejowan.multiappuninstaller.utils.SortKey
@@ -83,6 +86,7 @@ import com.rejowan.multiappuninstaller.utils.sortApps
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import timber.log.Timber
 
 /**
@@ -103,6 +107,11 @@ fun HomeScreen(
     val appList by viewModel.apps.collectAsState()
     val appListError by viewModel.error.collectAsState()
     val appListLoading by viewModel.loading.collectAsState()
+
+    // Shared update state
+    val updateRepository: UpdateRepository = koinInject()
+    val updateState by updateRepository.updateState.collectAsState()
+
     // Permission check
     val hasPackagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         context.checkSelfPermission(Manifest.permission.QUERY_ALL_PACKAGES) == PackageManager.PERMISSION_GRANTED
@@ -474,6 +483,14 @@ fun HomeScreen(
                     }
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
+                    // Update available banner
+                    (updateState as? UpdateState.Available)?.let { available ->
+                        UpdateBanner(
+                            newVersion = available.release.version,
+                            onClick = { isSettingsVisible = true }
+                        )
+                    }
+
                     // Search Bar with Sort button
                     SearchSection(
                         query = searchQuery,
