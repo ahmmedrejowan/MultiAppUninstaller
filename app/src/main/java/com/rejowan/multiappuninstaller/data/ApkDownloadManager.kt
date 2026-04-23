@@ -84,15 +84,15 @@ class ApkDownloadManager(private val context: Context) {
                     val query = DownloadManager.Query().setFilterById(downloadId)
                     downloadManager.query(query)?.use { cursor ->
                         if (cursor.moveToFirst()) {
-                            val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
+                            val status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
                             when (status) {
                                 DownloadManager.STATUS_SUCCESSFUL -> {
-                                    val localUri = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI))
+                                    val localUri = cursor.getString(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_LOCAL_URI))
                                     val actualFile = localUri?.let { uri -> Uri.parse(uri).path?.let { File(it) } } ?: targetFile
                                     trySend(DownloadState.Completed(actualFile))
                                 }
                                 DownloadManager.STATUS_FAILED -> {
-                                    val reason = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_REASON))
+                                    val reason = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON))
                                     trySend(DownloadState.Failed(getFailureReason(reason)))
                                 }
                             }
@@ -109,9 +109,9 @@ class ApkDownloadManager(private val context: Context) {
             val query = DownloadManager.Query().setFilterById(downloadId)
             downloadManager.query(query)?.use { cursor ->
                 if (cursor.moveToFirst()) {
-                    val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
-                    val bytesDownloaded = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
-                    val bytesTotal = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
+                    val status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
+                    val bytesDownloaded = cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
+                    val bytesTotal = cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
 
                     when (status) {
                         DownloadManager.STATUS_RUNNING -> {
@@ -119,14 +119,14 @@ class ApkDownloadManager(private val context: Context) {
                             trySend(DownloadState.Downloading(progress, bytesDownloaded, bytesTotal))
                         }
                         DownloadManager.STATUS_SUCCESSFUL -> {
-                            val localUri = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI))
+                            val localUri = cursor.getString(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_LOCAL_URI))
                             val actualFile = localUri?.let { uri -> Uri.parse(uri).path?.let { File(it) } } ?: targetFile
                             trySend(DownloadState.Completed(actualFile))
                             close()
                             return@use
                         }
                         DownloadManager.STATUS_FAILED -> {
-                            val reason = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_REASON))
+                            val reason = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON))
                             trySend(DownloadState.Failed(getFailureReason(reason)))
                             close()
                             return@use
