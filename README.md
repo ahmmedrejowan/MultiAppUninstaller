@@ -40,7 +40,7 @@ uninstall multiple apps at once. That's how the idea of Multi App Uninstaller ca
 
 You can download the latest APK from here
 
-<a href="https://github.com/ahmmedrejowan/MultiAppUninstaller/releases/download/1.0.0/MAU.1.0.0.apk">
+<a href="https://github.com/ahmmedrejowan/MultiAppUninstaller/releases/download/v1.0.0/MultiAppUninstaller-v1.0.0.apk">
 <img src="https://raw.githubusercontent.com/ahmmedrejowan/MultiAppUninstaller/master/files/get.png" width="224px" align="center"/>
 </a>
 
